@@ -4,8 +4,8 @@ compiler:
   - gcc
   
 before_script:
-  - mkdir build
-  - cd build
+  - mkdir build_folder
+  - cd build_folder
   - cmake ..
   
 script: make
