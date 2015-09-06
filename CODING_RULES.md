@@ -8,6 +8,7 @@
 * Google Test must be used for testing
 * All other files must be well organized within subdirectories
 * Cpp files, not cc files
+
 ## Code rules
 * Everything must be in well-formed English where appropriate
 * The first line of every file must contain a C++ style comment with the file name (// weapon.h)
