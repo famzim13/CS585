@@ -7,3 +7,4 @@
 * Execute the executable by running 'example'
 
 ## Coding Standard
+[Coding Standard Document] (CODING_STANDARD.md)
