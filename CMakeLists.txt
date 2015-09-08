@@ -1,16 +1,16 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required ( VERSION 2.6 )
 
-project (example)
+project ( GameDev )
 
 # Build engine
 
-add_executable(example game.m.cpp)
+add_executable( example game.m.cpp )
 
 # Build test cases
-
-add_subdirectory(test/gtest)
-
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+enable_testing()
+find_package( GTest REQUIRED )
+find_package( Threads REQUIRED )
+include_directories( ${GTEST_INCLUDE_DIRS} )
 add_executable( test test/test.cpp )
-target_link_libraries(test ${GTEST_LIBRARIES})
+target_link_libraries( test ${GTEST_BOTH_LIBRARIES} )
+target_link_libraries( test ${CMAKE_THREAD_LIBS_INIT} )
