@@ -1,5 +1,5 @@
 // test.cpp
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 TEST( AdditionTest, Equal )
 {
