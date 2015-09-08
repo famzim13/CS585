@@ -1,11 +1,12 @@
 // game.m.cpp
 #include <iostream>
 
+namespace StevensDev
+{
+
 int main()
 {
-    std::cout << "Hello\n";
-    std::cout << "This is a test\n";
-    std::cout << "Goodbye\n";
-
     return 0;
+}
+
 }
