@@ -1,15 +1,21 @@
 cmake_minimum_required( VERSION 2.6 )
 project( GameDev )
 
-# GTest
-add_subdirectory( lib/gtest-1.7.0 )
+# Enable Testing
 enable_testing()
+
+# Find Packages
+find_package( Threads REQUIRED )
+
+# Add Subdirectories
+add_subdirectory( lib/gtest-1.7.0 )
+
+# Include GTest Directories
 include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 
-# Main application
+# Add Executables
+add_executable( testing test/test.cpp )
 add_executable( example game.m.cpp )
 
-# Test application
-add_subdirectory( test )
-add_executable( test test/test.cpp )
-target_link_libraries( test gtest gtest_main )
+# Link Libraries
+target_link_libraries( testing gtest gtest_main )

@@ -12,5 +12,6 @@ script: make
 
 after_success:
   - ./example
+  - ./testing
   - cd ..
   - rm -rf build_folder/
