@@ -8,10 +8,11 @@ before_script:
   - cd build_folder
   - cmake ..
   
-script: make
-
-after_success:
+script:
+  - make
   - ./example
   - ./testing
+
+after_success:
   - cd ..
   - rm -rf build_folder/
