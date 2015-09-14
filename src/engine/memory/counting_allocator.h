@@ -56,10 +56,10 @@ class CountingAllocator : public DefaultAllocator<T>
 
 template <class T>
 int CountingAllocator<T>::d_totalAllocations = 0;
-  // Set d_totalAllocations to 0 before any objects are constructed
+  // Set d_totalAllocations to 0 before any objects are constructed.
 template <class T>
 int CountingAllocator<T>::d_totalDeallocations = 0;
-  // Set d_totalDeallocations to 0 before any objects are constructed
+  // Set d_totalDeallocations to 0 before any objects are constructed.
 
 // CONSTRUCTORS
 template <class T> inline

@@ -19,6 +19,12 @@ int main()
     std::cout << count.getAllocationCount() << "\n";
     std::cout << count2.getAllocationCount() << "\n";
     std::cout << count.getTotalAllocationCount() << "\n";
+    
+    array.push(1);
+    std::cout << array.at(0) << "\n";
+    std::cout << array[0] << "\n";
+    array[0] = 15;
+    std::cout << array[0] << "\n";
 
     return 0;
 }

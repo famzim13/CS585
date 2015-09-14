@@ -5,9 +5,11 @@
 #include <iostream>
 #include "../memory/default_allocator.h"
 #include <stdexcept>
+#include "string.h"
 
 #define DEFAULT_CAPACITY 10
 #define GOLDEN_RATIO 1.618
+#define MINIMUM_CAPACITY 10
 #define SHRINK_RATIO .5
 #define SHRINK_THRESHOLD .33
 
@@ -64,7 +66,7 @@ class DynamicArray
       // Retrieve and remove the last element, shifts array.
     T popFront();
       // Retrieve and remove the first element, shifts array.
-    void operator[]( int i );
+    T& operator[]( int i );
       // Sets element at index i, undefined behavior if out of bounds.
     void removeAt( unsigned int index );
       // Removes the element at the specified index, throws if invalid, array may shrink.
@@ -129,11 +131,6 @@ unsigned int DynamicArray<T>::getLength() const
 template <class T> inline
 T DynamicArray<T>::operator[]( int i ) const
 {
-    if( i < 0 || i >= d_length )
-    {
-      throw std::out_of_range( "Index out of range" );
-    }
-    
     return d_array[i];
 }
 
@@ -181,11 +178,10 @@ T DynamicArray<T>::popFront()
 }
 
 template <class T> inline
-void DynamicArray<T>::operator[]( int i )
+T& DynamicArray<T>::operator[]( int i )
 {
-
+    return d_array[i];
 }
-      // Sets element at index i, undefined behavior if out of bounds.
 
 template <class T> inline
 void DynamicArray<T>::removeAt( unsigned int index )
@@ -203,6 +199,8 @@ void DynamicArray<T>::removeAt( unsigned int index )
 template <class T> inline
 void DynamicArray<T>::insertAt( unsigned int index, const T& element )
 {
+    if( index < 0 || index >= d_capacity )
+      throw std::out_of_range( "Index out of range" );
     if( d_length == d_capacity )
       grow();
 
