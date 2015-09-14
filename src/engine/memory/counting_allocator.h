@@ -127,7 +127,7 @@ void CountingAllocator<T>::release( T* block, int count )
     d_deallocations += count;
     d_totalDeallocations += count;
     delete block;
-    block = nullptr;
+    block = 0;
 }
 
 } // End sgdm namespace

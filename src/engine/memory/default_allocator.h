@@ -55,7 +55,7 @@ template <class T> inline
 void DefaultAllocator<T>::release( T* block, int count )
 {
     delete block;
-    block = nullptr;
+    block = 0;
 }
 
 } // End sgdm namespace
