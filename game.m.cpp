@@ -7,9 +7,11 @@
 
 int main()
 {
-    std::cout << "Hello\n";
-    std::cout << "This is a test\n";
-    std::cout << "Goodbye sweet sanity\n";
+    using namespace StevensDev;
+    sgdm::CountingAllocator<int> count;
+    sgdm::IAllocator<int>* alloc = &count;
+    sgdc::DynamicArray<int> array( alloc );
+    std::cout << array.getCapacity() << "\n";
 
     return 0;
 }
