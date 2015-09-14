@@ -2,7 +2,7 @@
 #ifndef INCLUDED_COUNTING_ALLOCATOR
 #define INCLUDED_COUNTING_ALLOCATOR
 
-#include "default_allocator"
+#include "default_allocator.h"
 #include <iostream>
 
 namespace StevensDev
@@ -12,7 +12,7 @@ namespace sgdm
 {
 
 template <class T>
-class CountingAllocator : public DefaultAllocator
+class CountingAllocator : public DefaultAllocator<T>
 {
   private:
     int d_allocations;
@@ -40,11 +40,11 @@ class CountingAllocator : public DefaultAllocator
       // Get number of deallocations in this instance
     int getOutstandingCount() const;
       // Get number of in memory allocations in this instance
-    static int getTotalAllocationCount() const;
+    static int getTotalAllocationCount();
       // Get number of allocations across all instances
-    static int getTotalReleaseCount() const;
+    static int getTotalReleaseCount();
       // Get number of deallocations across all instances
-    static int getTotalOutstandingCount() const;
+    static int getTotalOutstandingCount();
       // Get number of in memory allocations across all instances
 
     // MEMBER FUNCTIONS
@@ -52,18 +52,17 @@ class CountingAllocator : public DefaultAllocator
       // Allocates a block of memory of type T with size count
     void release( T* block, int count );
       // Deallocates memory from block of size count
-}
+};
 
 template <class T>
-CountingAllocator<T>::d_totalAllocations = 0;
+int CountingAllocator<T>::d_totalAllocations = 0;
   // Set d_totalAllocations to 0 before any objects are constructed
 template <class T>
-CountingAllocator<T>::d_totalDeallocations = 0;
+int CountingAllocator<T>::d_totalDeallocations = 0;
   // Set d_totalDeallocations to 0 before any objects are constructed
 
 // CONSTRUCTORS
-inline
-template <class T>
+template <class T> inline
 CountingAllocator<T>::CountingAllocator()
 {
     d_allocations = 0;
@@ -71,58 +70,50 @@ CountingAllocator<T>::CountingAllocator()
 }
 
 // DESTRUCTORS
-inline
-template <class T>
-CountingAllocator<T>::~CountingAllocator();
+template <class T> inline
+CountingAllocator<T>::~CountingAllocator()
 {
 }
 
 // ACCESSORS
-inline
-template <class T>
+template <class T> inline
 int CountingAllocator<T>::getAllocationCount() const
 {
     return d_allocations;
 }
 
-inline
-template <class T>
+template <class T> inline
 int CountingAllocator<T>::getReleaseCount() const
 {
     return d_deallocations;
 }
 
-inline
-template <class T>
+template <class T> inline
 int CountingAllocator<T>::getOutstandingCount() const
 {
     return d_allocations - d_deallocations;
 }
 
-inline
-template <class T>
-static int CountingAllocator<T>::getTotalAllocationCount() const
+template <class T> inline
+int CountingAllocator<T>::getTotalAllocationCount()
 {
     return d_totalAllocations;
 }
 
-inline
-template <class T>
-static int CountingAllocator<T>::getTotalReleaseCount() const
+template <class T> inline
+int CountingAllocator<T>::getTotalReleaseCount()
 {
     return d_totalDeallocations;
 }
 
-inline
-template <class T>
-static int CountingAllocator<T>::getTotalOutstandingCount() const
+template <class T> inline
+int CountingAllocator<T>::getTotalOutstandingCount()
 {
     return d_totalAllocations - d_totalDeallocations;
 }
 
 // MEMBER FUNCTIONS
-inline
-template <class T>
+template <class T> inline
 T* CountingAllocator<T>::get( int count )
 {
     d_allocations += count;
@@ -130,13 +121,12 @@ T* CountingAllocator<T>::get( int count )
     return new T[count];
 }
 
-inline
-template <class T>
+template <class T> inline
 void CountingAllocator<T>::release( T* block, int count )
 {
     d_deallocations += count;
     d_totalDeallocations += count;
-    delete block[];
+    delete block;
     block = nullptr;
 }
 

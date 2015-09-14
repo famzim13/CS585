@@ -23,39 +23,22 @@ class IAllocator
       // Default destructor
 
     // MEMBER FUNCTIONS
-    virtual T* get( int count );
+    virtual T* get( int count ) = 0;
       // Allocates a block of memory of type T with size count
-    virtual void release( T* block, int count );
+    virtual void release( T* block, int count ) = 0;
       // Deallocates memory from block of size count
 };
 
 // CONSTRUCTOR
-inline
-template <class T>
+template <class T> inline
 IAllocator<T>::IAllocator()
 {
 }
 
 // DESTRUCTOR
-inline
-template <class T>
+template <class T> inline
 IAllocator<T>::~IAllocator()
 {
-}
-
-// MEMBER FUNCTIONS
-inline
-template <class T>
-virtual T* IAllocator<T>::get( int count )
-{
-    return 0;
-}
-
-inline
-template <class T>
-virtual void IAllocator<T>::release( T* block, int count )
-{
-    return 0;
 }
 
 } // End sgdm namespace

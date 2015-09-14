@@ -12,7 +12,7 @@ namespace sgdm
 {
 
 template <class T>
-class DefaultAllocator : public IAllocator
+class DefaultAllocator : public IAllocator<T>
 {
   private:
 
@@ -30,35 +30,31 @@ class DefaultAllocator : public IAllocator
       // Allocates a block of memory of type T with size count
     void release( T* block, int count );
       // Deallocates memory from block of size count
-}
+};
 
 // CONSTRUCTOR
-inline
-template <class T>
+template <class T> inline
 DefaultAllocator<T>::DefaultAllocator()
 {
 }
 
 // DESTRUCTOR
-inline
-template <class T>
+template <class T> inline
 DefaultAllocator<T>::~DefaultAllocator()
 {
 }
 
 // MEMBER FUNCTIONS
-inline
-template <class T>
+template <class T> inline
 T* DefaultAllocator<T>::get( int count )
 {
     return new T[count];
 }
 
-inline
-template <class T>
+template <class T> inline
 void DefaultAllocator<T>::release( T* block, int count )
 {
-    delete block[];
+    delete block;
     block = nullptr;
 }
 
