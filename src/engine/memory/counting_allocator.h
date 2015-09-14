@@ -16,42 +16,42 @@ class CountingAllocator : public DefaultAllocator<T>
 {
   private:
     int d_allocations;
-      // Amount of allocations in this instance
+      // Amount of allocations in this instance.
     int d_deallocations;
-      // Amount of deallocations in this instance
+      // Amount of deallocations in this instance.
     static int d_totalAllocations;
-      // Amount of allocations across all instances
+      // Amount of allocations across all instances.
     static int d_totalDeallocations;
-      // Amount of deallocations across all instances
+      // Amount of deallocations across all instances.
 
   public:
     // CONSTRUCTORS
     CountingAllocator();
-      // Default constructor
+      // Default constructor.
 
     // DESTRUCTORS
     ~CountingAllocator();
-      // Default destructor
+      // Default destructor.
 
     // ACCESSORS
     int getAllocationCount() const;
-      // Get number of allocations in this instance
+      // Get number of allocations in this instance.
     int getReleaseCount() const;
-      // Get number of deallocations in this instance
+      // Get number of deallocations in this instance.
     int getOutstandingCount() const;
-      // Get number of in memory allocations in this instance
+      // Get number of in memory allocations in this instance.
     static int getTotalAllocationCount();
-      // Get number of allocations across all instances
+      // Get number of allocations across all instances.
     static int getTotalReleaseCount();
-      // Get number of deallocations across all instances
+      // Get number of deallocations across all instances.
     static int getTotalOutstandingCount();
-      // Get number of in memory allocations across all instances
+      // Get number of in memory allocations across all instances.
 
     // MEMBER FUNCTIONS
     T* get( int count );
-      // Allocates a block of memory of type T with size count
+      // Allocates a block of memory of type T with size count.
     void release( T* block, int count );
-      // Deallocates memory from block of size count
+      // Deallocates memory from block of size count.
 };
 
 template <class T>

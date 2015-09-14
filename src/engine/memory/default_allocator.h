@@ -19,17 +19,17 @@ class DefaultAllocator : public IAllocator<T>
   public:
     // CONSTRUCTORS
     DefaultAllocator();
-      // Default constructor
+      // Default constructor.
 
     // DESTRUCTORS
     ~DefaultAllocator();
-      // Default destructor
+      // Default destructor.
 
     // MEMBER FUNCTIONS
     T* get( int count );
-      // Allocates a block of memory of type T with size count
+      // Allocates a block of memory of type T with size count.
     void release( T* block, int count );
-      // Deallocates memory from block of size count
+      // Deallocates memory from block of size count.
 };
 
 // CONSTRUCTOR

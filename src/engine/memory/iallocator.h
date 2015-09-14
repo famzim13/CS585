@@ -16,17 +16,17 @@ class IAllocator
   public:
     // CONSTRUCTORS
     IAllocator();
-      // Default constructor
+      // Default constructor.
 
     // DESTRUCTORS
     ~IAllocator();
-      // Default destructor
+      // Default destructor.
 
     // MEMBER FUNCTIONS
     virtual T* get( int count ) = 0;
-      // Allocates a block of memory of type T with size count
+      // Allocates a block of memory of type T with size count.
     virtual void release( T* block, int count ) = 0;
-      // Deallocates memory from block of size count
+      // Deallocates memory from block of size count.
 };
 
 // CONSTRUCTOR
