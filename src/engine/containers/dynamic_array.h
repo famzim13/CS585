@@ -7,9 +7,9 @@
 #include <stdexcept>
 #include "string.h"
 
-#define DEFAULT_CAPACITY 10
+#define DEFAULT_CAPACITY 3
 #define GOLDEN_RATIO 1.618
-#define MINIMUM_CAPACITY 10
+#define MINIMUM_CAPACITY 3
 #define SHRINK_RATIO .5
 #define SHRINK_THRESHOLD .33
 
@@ -192,7 +192,7 @@ void DynamicArray<T>::removeAt( unsigned int index )
     d_alloc->release( d_array[index], 1 );
     memcpy( &d_array[index], &d_array[index + 1], ( d_length - 1 ) * sizeof(T) );
 
-    if( d_length < d_capacity * SHRINK_THRESHOLD )
+    if( d_length < d_capacity * SHRINK_THRESHOLD && d_capacity > MINIMUM_CAPACITY)
       shrink();
 }
 
@@ -225,6 +225,8 @@ template <class T> inline
 void DynamicArray<T>::shrink()
 {
     unsigned int shrinkCapacity = (unsigned int)d_capacity / SHRINK_RATIO;
+    if( shrinkCapacity < MINIMUM_CAPACITY )
+      shrinkCapacity = MINIMUM_CAPACITY;
     T* shrinkArray = d_alloc->get( shrinkCapacity );
     memcpy( shrinkArray, d_array, d_length * sizeof(T) );
     d_alloc->release( d_array, d_capacity );
