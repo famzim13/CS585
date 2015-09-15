@@ -212,7 +212,7 @@ void DynamicArray<T>::grow()
 {
     unsigned int growCapacity = (unsigned int)d_capacity * GOLDEN_RATIO;
     T* growArray = d_alloc->get( growCapacity );
-    memmove( &growArray, &d_array, d_length*sizeof(T) );
+    std::copy( d_array, &d_array[d_length], growArray );
     d_alloc->release( d_array, d_capacity );
     d_array = growArray;
     d_capacity = growCapacity;
@@ -225,7 +225,7 @@ void DynamicArray<T>::shrink()
     if( shrinkCapacity < MINIMUM_CAPACITY )
       shrinkCapacity = MINIMUM_CAPACITY;
     T* shrinkArray = d_alloc->get( shrinkCapacity );
-    memmove( &shrinkArray, &d_array, d_length*sizeof(T) );
+    std::copy( d_array, &d_array[d_length], shrinkArray );
     d_alloc->release( d_array, d_capacity );
     d_array = shrinkArray;
     d_capacity = shrinkCapacity;
