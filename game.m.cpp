@@ -20,11 +20,29 @@ int main()
     std::cout << count2.getAllocationCount() << "\n";
     std::cout << count.getTotalAllocationCount() << "\n";
     
-    array.push(1);
-    std::cout << array.at(0) << "\n";
-    std::cout << array[0] << "\n";
-    array[0] = 15;
-    std::cout << array[0] << "\n";
+    array.push(8);
+    array.pushFront(100);
+    array.insertAt(1, 10);
+    array.insertAt(1, 5);
+    array.insertAt(2, 6);
+    std::cout << "Pop Front: " << array.popFront() << "\n";
+    for(int i=0; i<5; i++)
+      std::cout << array[i] << "\n";
+    std::cout << "End Post Pop Front\n";
+    std::cout << "Pop: " << array.pop() << "\n";
+    for(int i=0; i<5; i++)
+      std::cout << array[i] << "\n";
+    std::cout << "End Post Pop\n";
+    std::cout << "Remove At: 1\n";
+    array.removeAt(1);
+    for(int i=0; i<5; i++)
+      std::cout << array[i] << "\n";
+    std::cout << "End Post 1st Remove At\n";
+    array.removeAt(1);
+    for(int i=0; i<5; i++)
+      std::cout << array[i] << "\n";
+    std::cout << "End Post 2st Remove At\n";
+    std::cout << array << "\n";
 
     return 0;
 }

@@ -109,9 +109,7 @@ template <class T> inline
 T DynamicArray<T>::at( unsigned int index ) const
 {
     if( index < 0 || index >= d_length )
-    {
       throw std::out_of_range( "Index out of range" );
-    }
     
     return d_array[index];
 }
@@ -151,7 +149,7 @@ void DynamicArray<T>::pushFront( T element )
     if( d_length == d_capacity )
       grow();
 
-    memcpy( &d_array[1], d_array, d_length * sizeof(T) );
+    memmove( &d_array[1], &d_array[0], d_length*sizeof(T) );
     d_array[0] = element;
     d_length++;
 }
@@ -160,7 +158,7 @@ template <class T> inline
 T DynamicArray<T>::pop()
 {
     T popElement = d_array[d_length-1];
-    d_alloc->release( d_array[d_length-1], 1 );
+    d_array[d_length-1] = 0;
     d_length--;
     
     return popElement;
@@ -170,8 +168,7 @@ template <class T> inline
 T DynamicArray<T>::popFront()
 {
     T popElement = d_array[0];
-    d_alloc->release( d_array[0], 1 );
-    memcpy( d_array, &d_array[1], ( d_length - 1 ) * sizeof(T) );
+    memmove( &d_array[0], &d_array[1], d_length*sizeof(T) );
     d_length--;
 
     return popElement;
@@ -189,8 +186,8 @@ void DynamicArray<T>::removeAt( unsigned int index )
     if( index < 0 || index >= d_length )
       throw std::out_of_range( "Index out of range" );
 
-    d_alloc->release( d_array[index], 1 );
-    memcpy( &d_array[index], &d_array[index + 1], ( d_length - 1 ) * sizeof(T) );
+    memmove( &d_array[index], &d_array[index+1], (d_length-index)*sizeof(T) );
+    d_length--;
 
     if( d_length < d_capacity * SHRINK_THRESHOLD && d_capacity > MINIMUM_CAPACITY)
       shrink();
@@ -204,7 +201,7 @@ void DynamicArray<T>::insertAt( unsigned int index, const T& element )
     if( d_length == d_capacity )
       grow();
 
-    memcpy( &d_array[index + 1], &d_array[index], ( d_length - 1 ) * sizeof(T) );
+    memmove( &d_array[index + 1], &d_array[index], (d_length-index)*sizeof(T) );
     d_array[index] = element;
     d_length++;
 }
@@ -215,7 +212,7 @@ void DynamicArray<T>::grow()
 {
     unsigned int growCapacity = (unsigned int)d_capacity * GOLDEN_RATIO;
     T* growArray = d_alloc->get( growCapacity );
-    memcpy( growArray, d_array, d_length * sizeof(T) );
+    memmove( &growArray, &d_array, d_length*sizeof(T) );
     d_alloc->release( d_array, d_capacity );
     d_array = growArray;
     d_capacity = growCapacity;
@@ -224,11 +221,11 @@ void DynamicArray<T>::grow()
 template <class T> inline
 void DynamicArray<T>::shrink()
 {
-    unsigned int shrinkCapacity = (unsigned int)d_capacity / SHRINK_RATIO;
+    unsigned int shrinkCapacity = (unsigned int)d_capacity * SHRINK_RATIO;
     if( shrinkCapacity < MINIMUM_CAPACITY )
       shrinkCapacity = MINIMUM_CAPACITY;
     T* shrinkArray = d_alloc->get( shrinkCapacity );
-    memcpy( shrinkArray, d_array, d_length * sizeof(T) );
+    memmove( &shrinkArray, &d_array, d_length*sizeof(T) );
     d_alloc->release( d_array, d_capacity );
     d_array = shrinkArray;
     d_capacity = shrinkCapacity;

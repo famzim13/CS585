@@ -61,6 +61,18 @@ template <class T>
 int CountingAllocator<T>::d_totalDeallocations = 0;
   // Set d_totalDeallocations to 0 before any objects are constructed.
 
+// FREE OPERATORS
+template <class T> inline
+std::ostream& operator<<( std::ostream& stream, const CountingAllocator<T>& alloc )
+{
+    return stream << "{ allocations : " << alloc.getAllocationCount() <<
+       ", deallocations : " << alloc.getDeallocationCount() << 
+       ", outstanding : " << alloc.getOutstandingCount() <<
+       ", totalAllocations : " << alloc.getTotalAllocationCount() <<
+       ", totalDeallocations : " << alloc.getTotalDeallocationCount() <<
+       ", totalOutstanding : " << alloc.getTotalOutstandingCount() << " }";
+}
+
 // CONSTRUCTORS
 template <class T> inline
 CountingAllocator<T>::CountingAllocator()
@@ -126,7 +138,7 @@ void CountingAllocator<T>::release( T* block, int count )
 {
     d_deallocations += count;
     d_totalDeallocations += count;
-    delete block;
+    delete[] block;
     block = 0;
 }
 

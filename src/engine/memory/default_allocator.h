@@ -54,7 +54,7 @@ T* DefaultAllocator<T>::get( int count )
 template <class T> inline
 void DefaultAllocator<T>::release( T* block, int count )
 {
-    delete block;
+    delete[] block;
     block = 0;
 }
 
