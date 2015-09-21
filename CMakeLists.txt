@@ -1,6 +1,16 @@
 cmake_minimum_required( VERSION 2.8 )
 project( GameDev )
 
+# Set C++ Version
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CXX14)
+CHECK_CXX_COMPILER_FLAG("-std=c++1y" HAS_CXX1Y)
+if(HAS_CXX14)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(HAS_CXX1Y)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
 # Enable Testing
 enable_testing()
 
@@ -17,6 +27,7 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 add_executable( testing test/test.cpp )
 add_executable( example game.m.cpp
 		src/engine/containers/dynamic_array.cpp
+		src/engine/containers/map.cpp
 		src/engine/memory/counting_allocator.cpp
 		src/engine/memory/default_allocator.cpp
 		src/engine/memory/iallocator.cpp )

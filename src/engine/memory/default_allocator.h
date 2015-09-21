@@ -4,6 +4,7 @@
 
 #include "iallocator.h"
 #include <new>
+#include "string.h"
 
 namespace StevensDev
 {

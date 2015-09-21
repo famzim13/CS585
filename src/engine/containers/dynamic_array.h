@@ -6,6 +6,7 @@
 #include "../memory/default_allocator.h"
 #include <stdexcept>
 #include "string.h"
+#include <utility>
 
 #define DEFAULT_CAPACITY 3
 #define GOLDEN_RATIO 1.618
@@ -42,6 +43,8 @@ class DynamicArray
       // Default constructor.
     DynamicArray( sgdm::IAllocator<T>* alloc );
       // Constructor with pointer to allocator.
+    DynamicArray( const DynamicArray<T>& array );
+      // Copy constructor
 
     // DESTRUCTORS
     ~DynamicArray();
@@ -54,7 +57,7 @@ class DynamicArray
       // Get capacity of array.
     unsigned int getLength() const;
       // Get length of array.
-    T operator[]( int i ) const;
+    T& operator[]( int i ) const;
       // Get element at index i, undefined behavior if out of bounds.
 
     // MUTATORS
@@ -68,6 +71,8 @@ class DynamicArray
       // Retrieve and remove the first element, shifts array.
     T& operator[]( int i );
       // Sets element at index i, undefined behavior if out of bounds.
+    DynamicArray<T>& operator=( const DynamicArray<T>& array );
+      // Operator to set one array equal to another
     void removeAt( unsigned int index );
       // Removes the element at the specified index, throws if invalid, array may shrink.
     void insertAt( unsigned int index, const T& element );
@@ -86,6 +91,11 @@ std::ostream& operator<<( std::ostream& stream, const DynamicArray<T>& array )
 template <class T> inline
 DynamicArray<T>::DynamicArray()
 {
+    sgdm::DefaultAllocator<T> defaultAlloc = sgdm::DefaultAllocator<T>();
+    d_alloc = &defaultAlloc;
+    d_capacity = DEFAULT_CAPACITY;
+    d_array = d_alloc->get( d_capacity );
+    d_length = 0;
 }
 
 template <class T> inline
@@ -95,6 +105,16 @@ DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc )
     d_capacity = DEFAULT_CAPACITY;
     d_array = d_alloc->get( d_capacity );
     d_length = 0;
+}
+
+template <class T> inline
+DynamicArray<T>::DynamicArray( const DynamicArray<T>& array )
+{
+    *d_alloc = *array.d_alloc;
+    d_capacity = array.d_capacity;
+    d_length = array.d_length;
+    d_array = d_alloc->get( d_capacity );
+    *d_array = *array.d_array;
 }
 
 // DESTRUCTORS
@@ -127,7 +147,7 @@ unsigned int DynamicArray<T>::getLength() const
 }
 
 template <class T> inline
-T DynamicArray<T>::operator[]( int i ) const
+T& DynamicArray<T>::operator[]( int i ) const
 {
     return d_array[i];
 }
@@ -139,7 +159,6 @@ void DynamicArray<T>::push( const T& element )
     if( d_length == d_capacity )
       grow();
 
-    d_array[d_length] = element;
     d_length++;
 }
 
@@ -178,6 +197,18 @@ template <class T> inline
 T& DynamicArray<T>::operator[]( int i )
 {
     return d_array[i];
+}
+
+template <class T> inline
+DynamicArray<T>& DynamicArray<T>::operator=( const DynamicArray<T>& array )
+{
+    *d_alloc = *array.d_alloc;
+    d_capacity = array.d_capacity;
+    d_length = array.d_length;
+    d_array = d_alloc->get( d_capacity );
+    *d_array = *array.d_array;
+
+    return *this;
 }
 
 template <class T> inline

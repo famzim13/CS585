@@ -4,6 +4,7 @@
 
 #include "default_allocator.h"
 #include <iostream>
+#include "string.h"
 
 namespace StevensDev
 {
