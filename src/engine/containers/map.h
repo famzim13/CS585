@@ -22,9 +22,9 @@ class Map
   private:
     struct d_node
     {
-      d_node* children;
-      bool isleaf = true;
+      d_node** children;
       std::string key;
+      int childCount;
       T value;
     };
       // Data type for dynamic array map.
@@ -34,7 +34,7 @@ class Map
       // Map value array allocator.
     sgdm::IAllocator<d_node>* d_nodeAlloc;
       // Map node allocator.
-    void buildNode( d_node* node );
+    d_node* buildNode();
       // Function for creating a new node.
     void freeTrie( d_node* node );
       // Function for removing entire Trie.
@@ -85,7 +85,7 @@ Map<T>::Map()
     sgdm::DefaultAllocator<T> valueDefaultAlloc = sgdm::DefaultAllocator<T>();
     d_valueAlloc = &valueDefaultAlloc;
 
-    buildNode( root );
+    root = buildNode();
 }
 
 template <class T> inline
@@ -95,7 +95,7 @@ Map<T>::Map( sgdm::IAllocator<T>* alloc )
     d_nodeAlloc = &nodeDefaultAlloc;
     d_valueAlloc = alloc;
 
-    buildNode( root );
+    root = buildNode();
 }
 
 template <class T> inline
@@ -111,8 +111,8 @@ Map<T>::Map( const Map<T>& map )
 template <class T> inline
 Map<T>::~Map()
 {
-    ~d_nodeAlloc();
-    ~d_valueAlloc();
+    d_nodeAlloc->~IAllocator();
+    d_valueAlloc->~IAllocator();
     freeTrie( root );
 }
 
@@ -181,16 +181,25 @@ Map<T>& Map<T>::operator=( const Map<T>& map )
 template <class T> inline
 T& Map<T>::operator[]( const std::string& key )
 {
-    d_node* node = root;
-    for( int i = 0; i < key.length(); i++ )
+    int keySize = key.length();
+    std::cout << "In operator mutator\n";
+    d_node *node = root;
+    for( int i = 0; i < keySize; i++ )
     {
-      if( node->children[key[i]] )
-        node = node->children[key[i]];
+      std::cout << "Trying to check if children exist\n";
+      std::cout << "node info: " << &node->children[int( key[i]-97 )] << "key: " << key[i]-97 << "\n";
+      if( &node->children[int( key[i]-97 )] > 0 )
+      {
+        std::cout << "Trying to change node pointer\n";
+        node = node->children[key[i]-97];
+      }
       else
       {
-        buildNode( node->children[key[i]] );
-        node->isleaf = false;
-        node = node->children[key[i]];
+        std::cout << "Trying to build a new node\n";
+        node->children[key[i]-97] = buildNode();
+        std::cout << "Node built\n";
+        node->childCount++;
+        node = node->children[key[i]-97];
       }
     }
 
@@ -219,23 +228,24 @@ void Map<T>::remove( const std::string& key )
 
 // MEMBER FUNCTIONS
 template <class T> inline
-void Map<T>::buildNode( d_node* node )
+typename Map<T>::d_node* 
+Map<T>::buildNode( )
 {
-    node = new d_node;
-    node.key = 0;
-    node.value = 0;
-    node.arrayPosition = 0;
-    node.children = d_nodeAlloc->get( ALPHABET_SIZE );
+    std::cout << "Building node\n";
+    d_node* node = new d_node();
+    node->key = "";
+    node->childCount = 0;
+    node->value = 0;
+    std::cout << "Done building node\n";
 
-    for( int i = 0; i < ALPHABET_SIZE; i++ )
-      node.children[i] = 0;
+    return node;
 }
 
 template <class T> inline
 void Map<T>::freeTrie( d_node* node )
 {
     for( int i = 0; i < ALPHABET_SIZE; i++ )
-      if( node->children[i] )
+      if( &node->children[i] )
         freeTrie( node->children[i] );
     removeNode( node );
 }
@@ -243,9 +253,9 @@ void Map<T>::freeTrie( d_node* node )
 template <class T> inline
 void Map<T>::removeNode( d_node* node )
 {
-    node->key = 0;
+    node->key = "";
     node->value = 0;
-    d_nodeAlloc->release( node.children, ALPHABET_SIZE );
+    d_nodeAlloc->release( *node->children, ALPHABET_SIZE );
 }
 
 template <class T> inline
