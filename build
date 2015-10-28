@@ -1,4 +1,0 @@
-mkdir build_folder
-cd build_folder
-cmake ..
-make
