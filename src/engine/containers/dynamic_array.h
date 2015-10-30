@@ -20,10 +20,10 @@ namespace sgdc
 #define SHRINK_THRESHOLD .33
 
 template <class T>
-class DynamicArray()
+class DynamicArray
 {
   private:
-    IAllocator* d_alloc;
+    sgdm::IAllocator<T>* d_alloc;
       // Allocator that the array uses.
 
     T* d_array;
@@ -36,10 +36,10 @@ class DynamicArray()
       // Number of elements in the array.
     
     // MEMBER FUNCTIONS
-    grow();
+    void grow();
       // Increase the capacity of the array when a threshold is met.
 
-    shrink();
+    void shrink();
       // Decrease the capacity of the array when a threshold is met.
 
   public:
@@ -47,7 +47,7 @@ class DynamicArray()
     DynamicArray();
       // Default constructor using default allocator.
 
-    DynamicArray( IAllocator* alloc );
+    DynamicArray( sgdm::IAllocator<T>* alloc );
       // Constructor using an allocator.
 
     DynamicArray( DynamicArray<T>& copy );
@@ -119,7 +119,7 @@ DynamicArray<T>::DynamicArray()
 }
 
 template <class T>
-DynamicArray<T>::DynamicArray( IAllocator<T>* alloc )
+DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
     d_array = d_alloc->get( DEFAULT_CAPACITY );
@@ -130,7 +130,7 @@ DynamicArray<T>::DynamicArray( IAllocator<T>* alloc )
 template <class T>
 DynamicArray<T>::DynamicArray( DynamicArray<T>& copy )
 {
-    d_alloc( new IAllocator<T>( *copy.d_alloc ) );
+    d_alloc( new sgdm::IAllocator<T>( *copy.d_alloc ) );
     d_array = d_alloc->get( copy.d_capacity );
     *d_array = *copy.d_array;
     d_capacity = copy.d_capacity;
@@ -152,7 +152,7 @@ DynamicArray<T>& DynamicArray<T>::operator=( const DynamicArray<T>& rhs )
     if( this != &rhs )
     {
       d_alloc->deallocate( d_array, d_capacity );
-      d_alloc( new IAllocator<T>( *rhs.d_alloc ) );
+      d_alloc( new sgdm::IAllocator<T>( *rhs.d_alloc ) );
       d_array = d_alloc->get( rhs.d_capacity );
       *d_array = *rhs.d_array;
       d_capacity = rhs.d_capacity;
@@ -169,11 +169,13 @@ DynamicArray<T>::~DynamicArray<T>()
 }
 
 // ACCESSORS
+template <class T>
 T& DynamicArray<T>::operator[]( int i ) const
 {
     return d_array[i];
 }
 
+template <class T>
 T DynamicArray<T>::at( unsigned int index ) const
 {
     if( index < 0 || index >= d_length )
@@ -184,22 +186,26 @@ T DynamicArray<T>::at( unsigned int index ) const
     return d_array[index];
 }
 
+template <class T>
 unsigned int DynamicArray<T>::getCapacity() const
 {
     return d_capacity;
 }
 
+template <class T>
 unsigned int DynamicArray<T>::getLength() const
 {
     return d_length;
 }
 
 // MUTATORS
+template <class T>
 T& DynamicArray<T>::operator[]( int i )
 {
     return d_array[i];
 }
 
+template <class T>
 void DynamicArray<T>::insertAt( unsigned int index, const T& element )
 {
     if( index < 0 || index >= d_capacity )
@@ -217,6 +223,7 @@ void DynamicArray<T>::insertAt( unsigned int index, const T& element )
     d_length++;
 }
 
+template <class T>
 T DynamicArray<T>::pop()
 {
     T popElement = d_array[d_length-1];
@@ -231,6 +238,7 @@ T DynamicArray<T>::pop()
     return popElement;
 }
 
+template <class T>
 T DynamicArray<T>::popFront()
 {
     T popElement = d_array[0];
@@ -245,6 +253,7 @@ T DynamicArray<T>::popFront()
     return popElement;
 }
 
+template <class T>
 void DynamicArray<T>::push( const T& element )
 {
     if( d_length == d_capacity )
@@ -256,6 +265,7 @@ void DynamicArray<T>::push( const T& element )
     d_length++;
 }
 
+template <class T>
 void DynamicArray<T>::pushFront( const T& element )
 {
     if( d_length == d_capacity )
@@ -268,6 +278,7 @@ void DynamicArray<T>::pushFront( const T& element )
     d_length++;
 }
 
+template <class T>
 T DynamicArray<T>::removeAt( unsigned int index )
 {
     if( index < 0 || index >= d_length )
