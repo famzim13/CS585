@@ -32,6 +32,8 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 # Add Executables
 # add_executable( testing test/test.cpp )
 add_executable( example game.m.cpp
+		src/engine/memory/counting_allocator.cpp
+		src/engine/memory/default_allocator.cpp
 		src/engine/memory/iallocator.cpp )
 
 # Link Libraries
