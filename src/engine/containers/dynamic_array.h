@@ -64,7 +64,7 @@ class DynamicArray
       // Default destructor.
 
     // ACCESSORS
-    T& operator[]( int i ) const;
+    const T& operator[]( int i ) const;
       // Gets an element, undefined if out of bounds.
 
     T at( unsigned int index ) const;
@@ -170,7 +170,7 @@ DynamicArray<T>::~DynamicArray<T>()
 
 // ACCESSORS
 template <class T>
-T& DynamicArray<T>::operator[]( int i ) const
+const T& DynamicArray<T>::operator[]( int i ) const
 {
     return d_array[i];
 }

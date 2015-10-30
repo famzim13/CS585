@@ -2,6 +2,8 @@
 #ifndef INCLUDED_IALLOCATOR
 #define INCLUDED_IALLOCATOR
 
+#include <new>
+
 namespace StevensDev
 {
 
@@ -28,6 +30,15 @@ class IAllocator
 
     virtual void release ( T* memory, int count ) = 0;
       // Abstract which will be implemented in sub-classes.
+
+    void construct( T* pointer, const T& copy );
+      // Copy constructor for T.
+
+    void construct( T* pointer, T&& copy );
+      // Move constructor for T.
+
+    void destruct( T* pointer );
+      // Destructor for T.
 };
 
 // CONSTRUCTORS
@@ -40,6 +51,25 @@ IAllocator<T>::IAllocator()
 template <class T>
 IAllocator<T>::~IAllocator()
 {
+}
+
+// FREE OPERATORS
+template <class T>
+void IAllocator<T>::construct( T* pointer, const T& copy )
+{
+    pointer = new T( copy );
+}
+
+template <class T>
+void IAllocator<T>::construct( T* pointer, T&& copy )
+{
+    pointer = new T( copy );
+}
+
+template <class T>
+void IAllocator<T>::destruct( T* pointer )
+{
+    delete pointer;
 }
 
 } // end namespace sgdm

@@ -33,9 +33,11 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 # add_executable( testing test/test.cpp )
 add_executable( example game.m.cpp
 		src/engine/containers/dynamic_array.cpp
+		src/engine/containers/map.cpp
 		src/engine/memory/counting_allocator.cpp
 		src/engine/memory/default_allocator.cpp
-		src/engine/memory/iallocator.cpp )
+		src/engine/memory/iallocator.cpp 
+		src/engine/memory/stack_guard.cpp )
 
 # Link Libraries
 # target_link_libraries( testing gtest gtest_main )
