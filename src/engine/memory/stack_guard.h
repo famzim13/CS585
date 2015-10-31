@@ -2,6 +2,7 @@
 #ifndef INCLUDED_STACK_GUARD
 #define INCLUDED_STACK_GUARD
 
+#include <new>
 #include <utility>
 
 namespace StevensDev
@@ -17,7 +18,7 @@ class StackGuard
     T* d_guarded;
 
     // MEMBER FUNCTIONS
-    StackGuard( const StackGuard<T>& guard );
+    StackGuard( const StackGuard<T>& guard ) = delete;
       // Copy constructor is disabled for smart pointers.
 
   public:
@@ -78,7 +79,7 @@ T* StackGuard<T>::operator->() const
 template <class T>
 bool StackGuard<T>::operator==( bool rhs ) const
 {
-
+    return rhs;
 }
 
 template <class T>
@@ -90,7 +91,7 @@ bool StackGuard<T>::operator!() const
 template <class T>
 bool StackGuard<T>::operator!=( bool rhs ) const
 {
-
+    return !rhs;
 }
 
 } // end namespace sgdm

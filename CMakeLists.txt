@@ -34,6 +34,9 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 add_executable( example game.m.cpp
 		src/engine/containers/dynamic_array.cpp
 		src/engine/containers/map.cpp
+		src/engine/containers/trie_node.cpp
+		src/engine/data/json_entity.cpp
+		src/engine/data/json_parser.cpp
 		src/engine/memory/counting_allocator.cpp
 		src/engine/memory/default_allocator.cpp
 		src/engine/memory/iallocator.cpp 

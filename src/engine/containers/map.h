@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include "trie_node.h"
 #include <utility>
 
 namespace StevensDev
@@ -20,6 +21,10 @@ class Map
 {
   private:
     sgdm::IAllocator<T>* d_alloc;
+      // Memory allocator.
+
+    TrieNode<T>* d_root;
+      // Root of the trie.
 
   public:
     // CONSTRUCTORS
@@ -70,7 +75,7 @@ class Map
 template <class T>
 Map<T>::Map()
 {
-
+    d_alloc( new sgdm::DefaultAllocator<T>( ) );
 }
 
 template <class T>
@@ -82,26 +87,26 @@ Map<T>::Map( sgdm::IAllocator<T>* alloc )
 template <class T>
 Map<T>::Map( const Map<T>& copy )
 {
-
+    d_alloc( new sgdm::IAllocator<T>( *copy.d_alloc ) );
 }
 
 template <class T>
 Map<T>::Map( Map<T>&& move )
 {
-
+    d_alloc = std::move( move.d_alloc );
 }
 
 template <class T>
 Map<T>& Map<T>::operator=( const Map<T>& rhs )
 {
-
+    d_alloc( new sgdm::IAllocator<T>( *rhs.d_alloc ) );
+    return *this;
 }
 
 // DESTRUCTORS
 template <class T>
 Map<T>::~Map()
 {
-
 }
 
 // ACCESSORS
