@@ -2,7 +2,7 @@
 "Introduction" course to the wonderful world of game development.
 
 ## Build
-https://travis-ci.org/famzim13/CS585.svg?branch=master
+[![Build Status](https://travis-ci.org/famzim13/CS585.svg?branch=master)](https://travis-ci.org/famzim13/CS585)
 * Must build on Ubuntu
 * Execute the 'build' script in the root directory and observe that 'example' is created in 'build_folder' as an executable
 * Execute the executable by running 'example'
