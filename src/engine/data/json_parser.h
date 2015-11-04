@@ -12,7 +12,7 @@ namespace StevensDev
 namespace sgdd
 {
 
-class JsonParser
+struct JsonParser
 {
   private:
 
@@ -26,6 +26,7 @@ class JsonParser
       // Default destructor.
 
     // FREE OPERATORS
+    template <class T>
     JsonEntity* fromString( const std::string& rawJson, sgdm::IAllocator<T>* allocator = 0 );
       // Takes input of a JSON string and outputs a JSON entity.
 };
@@ -41,6 +42,7 @@ JsonParser::~JsonParser()
 }
 
 // FREE OPERATORS
+template <class T>
 JsonEntity* JsonParser::fromString( const std::string& rawJson, sgdm::IAllocator<T>* allocator = 0)
 {
    

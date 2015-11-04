@@ -1,6 +1,7 @@
 // dynamic_array.h
 #ifndef INCLUDED_DYNAMIC_ARRAY
 #define INCLDUED_DYNAMIC_ARRAY
+#pragma once
 
 #include "../memory/default_allocator.h"
 #include <iostream>
