@@ -2,6 +2,7 @@
 #ifndef INCLUDED_NODE
 #define INCLUDED_NODE
 
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -38,6 +39,9 @@ class Node
     Node( Node<T>&& move );
       // Move constructor.
 
+    Node<T>& operator=( const Node<T>& copy );
+      // Operator copy constructor.
+
     // DESTRUCTORS
     ~Node();
       // Default destructor.
@@ -62,7 +66,7 @@ class Node
     void setKey( const std::string& key );
       // Set the key of the node.
 
-    void setNext( const Node<T>& next );
+    void setNext( Node<T>& next );
       // Set the next node of the linked list.
 
 };
@@ -72,7 +76,6 @@ template <class T>
 Node<T>::Node()
 {
     d_next = NULL;
-    d_key = "";
 }
 
 template <class T>
@@ -88,15 +91,23 @@ Node<T>::Node( const Node<T>& copy )
 {
     d_next = std::copy( *copy.d_next );
     d_key = copy.d_key;
-    d_value = copy.d_value;
+    d_value = std::copy( copy.d_value );
 }
 
 template <class T>
 Node<T>::Node( Node<T>&& move )
 {
     d_next = std::move( move.d_next );
-    d_key = std::move( move.d_key );
+    d_key = move.d_key;
     d_value = std::move( move.d_value );
+}
+
+template <class T>
+Node<T>& Node<T>::operator=( const Node<T>& copy )
+{
+    d_next = std::copy( *copy.d_next );
+    d_key = copy.d_key;
+    d_value = std::copy( copy.d_value );
 }
 
 // DESTRUCTORS
@@ -145,9 +156,9 @@ void Node<T>::setKey( const std::string& key )
 }
 
 template <class T>
-void Node<T>::setNext( const Node<T>& next )
+void Node<T>::setNext( Node<T>& next )
 {
-    d_next = next;
+    d_next = &next;
 }
 
 } // end namespace sgdc

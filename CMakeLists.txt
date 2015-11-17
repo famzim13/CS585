@@ -29,6 +29,9 @@ find_package( Threads REQUIRED )
 # Include GTest Directories
 #include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 
+# Add Flags
+set( CMAKE_BUILDING_TYPE Debug )
+
 # Add Executables
 # add_executable( testing test/test.cpp )
 add_executable( example game.m.cpp

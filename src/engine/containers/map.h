@@ -27,8 +27,11 @@ class Map
     sgdm::IAllocator<Node<T>*>* d_nodeAlloc;
       // Memory allocator for nodes.
 
-    DynamicArray<Node<T>*>* d_nodes;
-      // Array of nodes.
+    Node<T>** d_nodes;
+      // Array for hash map.
+
+    int d_capacity = 100;
+      // Capacity of hash map.
 
     int d_valueCount;
       // Counts of elements in the map.
@@ -91,7 +94,7 @@ Map<T>::Map()
 {
     d_alloc = new sgdm::DefaultAllocator<T>( );
     d_nodeAlloc = new sgdm::DefaultAllocator<Node<T>*>( );
-    d_nodes = new DynamicArray<Node<T>*>( d_nodeAlloc, 100 );
+    d_nodes = d_nodeAlloc->get( 100 );
 }
 
 template <class T>
@@ -99,7 +102,7 @@ Map<T>::Map( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
     d_nodeAlloc = new sgdm::DefaultAllocator<Node<T>*>( );
-    d_nodes = new DynamicArray<Node<T>*>( d_nodeAlloc, 100 );
+    d_nodes = d_nodeAlloc->get( 100 );
 }
 
 template <class T>
@@ -107,7 +110,8 @@ Map<T>::Map( const Map<T>& copy )
 {
     d_alloc = new sgdm::IAllocator<T>( *copy.d_alloc );
     d_nodeAlloc = new sgdm::IAllocator<Node<T>*>( *copy.d_nodeAlloc );
-    d_nodes = new DynamicArray<Node<T>*>( *copy.d_nodes );
+    d_nodes = d_nodeAlloc->get( 100 );
+    d_nodes = std::copy( *copy.d_nodes );
 }
 
 template <class T>
@@ -174,12 +178,14 @@ template <class T>
 T& Map<T>::operator[]( const std::string& key )
 {
     bool found = false;
-    Node<T>* temp = (*d_nodes)[hash( key )];
+    unsigned int h = hash( key );
+    Node<T>* temp = d_nodes[h];
+    Node<T>* temp2;
 
     if( temp == NULL )
     {
-      std::cout << "Node not found, building one\n";
-      d_nodeAlloc->construct ( &(*d_nodes)[hash( key )], new Node<T>() );
+      temp = new Node<T>();
+      d_nodes[h] = temp;
       temp->setKey( key );
     }
 
@@ -187,22 +193,20 @@ T& Map<T>::operator[]( const std::string& key )
     {
       if( temp->getKey() == key )
       {
-        break;
         found = true;
+        break;
       }
+      temp2 = temp;
       temp = temp->getNext();
     }
 
     if( !found )
     {
-      std::cout << "Node not found, building one\n";
       temp = new Node<T>();
+      temp2->setNext( *temp );
       temp->setKey( key );
     }
 
-    std::cout << "Key is " << temp->getKey() << "\n";
-
-    std::cout << "Returning " << temp->setValue() << "\n";
     return temp->setValue();
 }
 
@@ -221,7 +225,7 @@ unsigned int Map<T>::hash( const std::string& key ) const
       hash *= key[i];
     }
 
-    return hash%d_nodes->getCapacity();
+    return hash%d_capacity;
 }
 
 } // end namespace sgdc
