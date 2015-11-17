@@ -34,6 +34,7 @@ find_package( Threads REQUIRED )
 add_executable( example game.m.cpp
 		src/engine/containers/dynamic_array.cpp
 		src/engine/containers/map.cpp
+    src/engine/containers/node.cpp
 		src/engine/data/json_entity.cpp
 		src/engine/data/json_parser.cpp
 		src/engine/memory/counting_allocator.cpp

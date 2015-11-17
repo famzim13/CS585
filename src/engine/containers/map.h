@@ -6,6 +6,7 @@
 #include "dynamic_array.h"
 #include <iostream>
 #include <new>
+#include "node.h"
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -23,18 +24,21 @@ class Map
     sgdm::IAllocator<T>* d_alloc;
       // Memory allocator for values.
 
-    sgdm::IAllocator<std::string>* d_keyAlloc;
-      // Memory allocator for keys.
+    sgdm::IAllocator<Node<T>*>* d_nodeAlloc;
+      // Memory allocator for nodes.
 
-    DynamicArray<std::string>* d_keys;
-      // Keys of the map.
+    DynamicArray<Node<T>*>* d_nodes;
+      // Array of nodes.
 
-    DynamicArray<T>* d_values;
-      // Values of the map.
+    int d_valueCount;
+      // Counts of elements in the map.
 
     // MEMBER FUNCTIONS
-    int hash( const std::string key ) const;
+    unsigned int hash( const std::string& key ) const;
       // Hashing function of keys.
+
+    void rehash();
+      // Grows the map and rehashes all elements.
 
   public:
     // CONSTRUCTORS
@@ -86,36 +90,32 @@ template <class T>
 Map<T>::Map()
 {
     d_alloc = new sgdm::DefaultAllocator<T>( );
-    d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
-    d_keys = new DynamicArray<std::string>( d_keyAlloc, 100 );
-    d_values = new DynamicArray<T>( d_alloc, 100 );
+    d_nodeAlloc = new sgdm::DefaultAllocator<Node<T>*>( );
+    d_nodes = new DynamicArray<Node<T>*>( d_nodeAlloc, 100 );
 }
 
 template <class T>
 Map<T>::Map( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
-    d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
-    d_keys = new DynamicArray<std::string>( d_keyAlloc, 100 );
-    d_values = new DynamicArray<T>( d_alloc, 100 );
+    d_nodeAlloc = new sgdm::DefaultAllocator<Node<T>*>( );
+    d_nodes = new DynamicArray<Node<T>*>( d_nodeAlloc, 100 );
 }
 
 template <class T>
 Map<T>::Map( const Map<T>& copy )
 {
     d_alloc = new sgdm::IAllocator<T>( *copy.d_alloc );
-    d_keyAlloc = new sgdm::IAllocator<std::string>( *copy.d_keyAlloc );
-    d_keys = new DynamicArray<std::string>( *copy.d_keys );
-    d_values = new DynamicArray<T>( *copy.d_values );
+    d_nodeAlloc = new sgdm::IAllocator<Node<T>*>( *copy.d_nodeAlloc );
+    d_nodes = new DynamicArray<Node<T>*>( *copy.d_nodes );
 }
 
 template <class T>
 Map<T>::Map( Map<T>&& move )
 {
     d_alloc = std::move( move.d_alloc );
-    d_keyAlloc = std::move( move.d_keyAlloc );
-    d_keys = std::move( move.d_keys );
-    d_values = std::move( move.d_values );
+    d_nodeAlloc = std::move( move.d_nodeAlloc );
+    d_nodes = std::move( move.d_nodes );
 }
 
 template <class T>
@@ -124,9 +124,8 @@ Map<T>& Map<T>::operator=( const Map<T>& rhs )
     if( this != rhs )
     {
       d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
-      d_keyAlloc = new sgdm::IAllocator<std::string>( *rhs.d_keyAlloc );
-      d_keys = new DynamicArray<std::string>( *rhs.d_keys );
-      d_values = new DynamicArray<T>( *rhs.d_values );
+      d_nodeAlloc = new sgdm::IAllocator<Node<T>*>( *rhs.d_nodeAlloc );
+      d_nodes = new DynamicArray<Node<T>*>( *rhs.d_nodes );
     }
     return *this;
 }
@@ -135,53 +134,94 @@ Map<T>& Map<T>::operator=( const Map<T>& rhs )
 template <class T>
 Map<T>::~Map()
 {
-    delete d_keys;
-    delete d_values;
+    delete d_nodes;
+    delete d_nodeAlloc;
 }
 
 // ACCESSORS
 template <class T>
 const T& Map<T>::operator[]( const std::string& key ) const
 {
-
+    Node<T>* temp = (*d_nodes)[hash( key )];
+    while( temp != NULL )
+    {
+      if( temp->d_key == key )
+      {
+        break;
+      }
+      temp = temp->d_next;
+    }
+    return temp->d_value;
 }
 
 template <class T>
 bool Map<T>::has( const std::string& key )
 {
-
 }
 
 template <class T>
 DynamicArray<std::string> Map<T>::keys() const
 {
-
 }
 
 template <class T>
 DynamicArray<T> Map<T>::values() const
 {
-
 }
 
 // MUTATORS
 template <class T>
 T& Map<T>::operator[]( const std::string& key )
 {
+    bool found = false;
+    Node<T>* temp = (*d_nodes)[hash( key )];
 
+    if( temp == NULL )
+    {
+      std::cout << "Node not found, building one\n";
+      d_nodeAlloc->construct ( &(*d_nodes)[hash( key )], new Node<T>() );
+      temp->setKey( key );
+    }
+
+    while( temp != NULL )
+    {
+      if( temp->getKey() == key )
+      {
+        break;
+        found = true;
+      }
+      temp = temp->getNext();
+    }
+
+    if( !found )
+    {
+      std::cout << "Node not found, building one\n";
+      temp = new Node<T>();
+      temp->setKey( key );
+    }
+
+    std::cout << "Key is " << temp->getKey() << "\n";
+
+    std::cout << "Returning " << temp->setValue() << "\n";
+    return temp->setValue();
 }
 
 template <class T>
 T Map<T>::remove( const std::string& key )
 {
-
 }
 
 // MEMBER FUNCTIONS
 template <class T>
-int Map<T>::hash( const std::string key ) const
+unsigned int Map<T>::hash( const std::string& key ) const
 {
+    unsigned int hash = 1;
+    for( int i=0; i<key.length(); i++ )
+    {
+      hash *= key[i];
+    }
 
+    return hash%d_nodes->getCapacity();
 }
 
 } // end namespace sgdc
