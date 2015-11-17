@@ -5,9 +5,9 @@
 #include "../memory/default_allocator.h"
 #include "dynamic_array.h"
 #include <iostream>
+#include <new>
 #include <stdexcept>
 #include <string>
-#include "trie_node.h"
 #include <utility>
 
 namespace StevensDev
@@ -21,13 +21,20 @@ class Map
 {
   private:
     sgdm::IAllocator<T>* d_alloc;
-      // Memory allocator.
+      // Memory allocator for values.
 
-    TrieNode<T>* d_root;
-      // Root of the trie.
+    sgdm::IAllocator<std::string>* d_keyAlloc;
+      // Memory allocator for keys.
+
+    DynamicArray<std::string>* d_keys;
+      // Keys of the map.
+
+    DynamicArray<T>* d_values;
+      // Values of the map.
 
     // MEMBER FUNCTIONS
-    int hash( const char c ) const;
+    int hash( const std::string key ) const;
+      // Hashing function of keys.
 
   public:
     // CONSTRUCTORS
@@ -79,34 +86,48 @@ template <class T>
 Map<T>::Map()
 {
     d_alloc = new sgdm::DefaultAllocator<T>( );
-    d_root = new sgdc::TrieNode<T>( );
+    d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
+    d_keys = new DynamicArray<std::string>( d_keyAlloc, 100 );
+    d_values = new DynamicArray<T>( d_alloc, 100 );
 }
 
 template <class T>
 Map<T>::Map( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
-    d_root = new sgdc::TrieNode<T>( );
+    d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
+    d_keys = new DynamicArray<std::string>( d_keyAlloc, 100 );
+    d_values = new DynamicArray<T>( d_alloc, 100 );
 }
 
 template <class T>
 Map<T>::Map( const Map<T>& copy )
 {
     d_alloc = new sgdm::IAllocator<T>( *copy.d_alloc );
-    d_root = std::copy( copy.d_root );
+    d_keyAlloc = new sgdm::IAllocator<std::string>( *copy.d_keyAlloc );
+    d_keys = new DynamicArray<std::string>( *copy.d_keys );
+    d_values = new DynamicArray<T>( *copy.d_values );
 }
 
 template <class T>
 Map<T>::Map( Map<T>&& move )
 {
     d_alloc = std::move( move.d_alloc );
-    d_root = std::move( move.d_root );
+    d_keyAlloc = std::move( move.d_keyAlloc );
+    d_keys = std::move( move.d_keys );
+    d_values = std::move( move.d_values );
 }
 
 template <class T>
 Map<T>& Map<T>::operator=( const Map<T>& rhs )
 {
-    d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
+    if( this != rhs )
+    {
+      d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
+      d_keyAlloc = new sgdm::IAllocator<std::string>( *rhs.d_keyAlloc );
+      d_keys = new DynamicArray<std::string>( *rhs.d_keys );
+      d_values = new DynamicArray<T>( *rhs.d_values );
+    }
     return *this;
 }
 
@@ -114,6 +135,8 @@ Map<T>& Map<T>::operator=( const Map<T>& rhs )
 template <class T>
 Map<T>::~Map()
 {
+    delete d_keys;
+    delete d_values;
 }
 
 // ACCESSORS
@@ -156,7 +179,7 @@ T Map<T>::remove( const std::string& key )
 
 // MEMBER FUNCTIONS
 template <class T>
-int Map<T>::hash( const char c ) const
+int Map<T>::hash( const std::string key ) const
 {
 
 }

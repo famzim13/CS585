@@ -18,8 +18,6 @@ namespace sgdc
 #define DEFAULT_CAPACITY 3
 #define GOLDEN_RATIO 1.618
 #define MINIMUM_CAPACITY 3
-#define SHRINK_RATIO .5
-#define SHRINK_THRESHOLD .33
 
 template <class T>
 class DynamicArray
@@ -44,9 +42,6 @@ class DynamicArray
     void moveLastIndex( int i );
       // Checks if the last index needs to be moved, moves it if so.
 
-    void shrink();
-      // Decrease the capacity of the array when a threshold is met.
-
   public:
     // CONSTRUCTORS
     DynamicArray();
@@ -55,7 +50,10 @@ class DynamicArray
     DynamicArray( sgdm::IAllocator<T>* alloc );
       // Constructor using an allocator.
 
-    DynamicArray( DynamicArray<T>& copy );
+    DynamicArray( sgdm::IAllocator<T>* alloc, unsigned int capacity );
+      // Constructor with an initiale capacity.
+
+    DynamicArray( const DynamicArray<T>& copy );
       // Copy constructor.
 
     DynamicArray( DynamicArray<T>&& move );
@@ -132,7 +130,16 @@ DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc )
 }
 
 template <class T>
-DynamicArray<T>::DynamicArray( DynamicArray<T>& copy )
+DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc, unsigned int capacity)
+{
+    d_alloc = alloc;
+    d_array = d_alloc->get( capacity );
+    d_capacity = capacity;
+    d_last_index = 0;
+}
+
+template <class T>
+DynamicArray<T>::DynamicArray( const DynamicArray<T>& copy )
 {
     d_alloc = new sgdm::DefaultAllocator<T>();
     *d_alloc = *copy.d_alloc;
@@ -240,12 +247,6 @@ T DynamicArray<T>::pop()
     d_alloc->destruct( d_array[d_last_index-1] );
     d_last_index--;
 
-    if( d_last_index < d_capacity * SHRINK_THRESHOLD
-        && d_capacity > MINIMUM_CAPACITY)
-    {
-      shrink();
-    }
-
     return popElement;
 }
 
@@ -256,12 +257,6 @@ T DynamicArray<T>::popFront()
     d_alloc->destruct( d_array[0] );
     memmove( &d_array[0], &d_array[1], d_last_index*sizeof(T) );
     d_last_index--;
-
-    if( d_last_index < d_capacity * SHRINK_THRESHOLD
-        && d_capacity > MINIMUM_CAPACITY)
-    {
-      shrink();
-    }
 
     return popElement;
 }
@@ -302,12 +297,6 @@ T DynamicArray<T>::removeAt( unsigned int index )
     d_alloc->destruct( d_array[index] );
     memmove( &d_array[index], &d_array[index+1], (d_last_index-index)*sizeof(T) );
     d_last_index--;
-
-    if( d_last_index < d_capacity * SHRINK_THRESHOLD
-        && d_capacity > MINIMUM_CAPACITY)
-    {
-      shrink();
-    }
 }
 
 // MEMBER FUNCTIONS
@@ -329,22 +318,6 @@ void DynamicArray<T>::moveLastIndex( int i )
     {
       d_last_index = i;
     }
-}
-
-template <class T>
-void DynamicArray<T>::shrink()
-{
-    unsigned int shrinkCapacity = (unsigned int)d_capacity * SHRINK_RATIO;
-    if( shrinkCapacity < MINIMUM_CAPACITY )
-    {
-      shrinkCapacity = MINIMUM_CAPACITY;
-    }
-
-    T* shrinkArray = d_alloc->get( shrinkCapacity );
-    std::copy( d_array, &d_array[d_last_index], shrinkArray );
-    d_alloc->release( d_array, d_capacity );
-    d_array = shrinkArray;
-    d_capacity = shrinkCapacity;
 }
 
 } // end namespace sgdc
