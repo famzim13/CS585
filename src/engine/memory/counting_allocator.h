@@ -73,8 +73,8 @@ int CountingAllocator<T>::d_totalDeallocations = 0;
 template <class T>
 CountingAllocator<T>::CountingAllocator()
 {
-  d_allocations = 0;
-  d_deallocations = 0;
+    d_allocations = 0;
+    d_deallocations = 0;
 }
 
 // DESTRUCTORS
@@ -87,55 +87,55 @@ CountingAllocator<T>::~CountingAllocator()
 template <class T>
 int CountingAllocator<T>::getAllocationCount() const
 {
-  return d_allocations;
+    return d_allocations;
 }
 
 template <class T>
 int CountingAllocator<T>::getDeallocationCount() const
 {
-  return d_deallocations;
+    return d_deallocations;
 }
 
 template <class T>
 int CountingAllocator<T>::getOutstandingCount() const
 {
-  return d_allocations - d_deallocations;
+    return d_allocations - d_deallocations;
 }
 
 template <class T>
 int CountingAllocator<T>::getTotalAllocationCount()
 {
-  return d_totalAllocations;
+    return d_totalAllocations;
 }
 
 template <class T>
 int CountingAllocator<T>::getTotalDeallocationCount()
 {
-  return d_totalDeallocations;
+    return d_totalDeallocations;
 }
 
 template <class T>
 int CountingAllocator<T>::getTotalOutstandingCount()
 {
-  return d_totalAllocations - d_totalDeallocations;
+    return d_totalAllocations - d_totalDeallocations;
 }
 
 // FREE OPERATORS
 template <class T>
 T* CountingAllocator<T>::get( int count )
 {
-  d_allocations += count;
-  d_totalAllocations += count;
-  return (T*) ::operator new (count*sizeof( T ));
+    d_allocations += count;
+    d_totalAllocations += count;
+    return (T*) ::operator new (count*sizeof( T ));
 }
 
 template <class T>
 void CountingAllocator<T>::release( T* memory, int count )
 {
-  d_deallocations += count;
-  d_totalDeallocations += count;
-  delete[] memory;
-  memory = 0;
+    d_deallocations += count;
+    d_totalDeallocations += count;
+    delete[] memory;
+    memory = 0;
 }
 
 template <class T>

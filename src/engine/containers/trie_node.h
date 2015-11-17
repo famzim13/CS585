@@ -4,6 +4,7 @@
 
 #include "../memory/default_allocator.h"
 #include "dynamic_array.h"
+#include <new>
 
 namespace StevensDev
 {
@@ -16,7 +17,10 @@ class TrieNode
 {
   private:
     sgdm::IAllocator<T>* d_alloc;
-      // Memory allocator.
+      // Content memory allocator.
+
+    sgdm::IAllocator<TrieNode<T>*>* d_trieAlloc;
+      // TrieNode memory allocator.
 
     DynamicArray<TrieNode<T>*>* d_children;
       // Children of the current node.
@@ -47,7 +51,7 @@ class TrieNode
     T get() const;
       // Returns content of the node.
 
-    
+
     // MUTATORS
 
 };
@@ -56,8 +60,9 @@ class TrieNode
 template <class T>
 TrieNode<T>::TrieNode()
 {
-    d_alloc( new sgdm::DefaultAllocator<T>() );
-    d_children = new DynamicArray<TrieNode*>( d_alloc );
+    d_alloc = new sgdm::DefaultAllocator<T>();
+    d_trieAlloc = new sgdm::DefaultAllocator<TrieNode<T>*>();
+    d_children = new DynamicArray<TrieNode<T>*>( d_trieAlloc );
     d_content = NULL;
     d_marker = false;
 }
@@ -66,9 +71,26 @@ template <class T>
 TrieNode<T>::TrieNode( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
-    d_children = new DynamicArray<TrieNode*>( d_alloc );
+    d_children = d_alloc->construct( DynamicArray<TrieNode*>( d_alloc ) );
     d_content = NULL;
     d_marker = false;
+}
+
+// DESTRUCTORS
+template <class T>
+TrieNode<T>::~TrieNode()
+{
+  for( int i=0; i<d_children->getCapacity(); i++ )
+  {
+    d_trieAlloc->destruct( &d_children[i] );
+  }
+}
+
+// ACCESSORS
+template <class T>
+T TrieNode<T>::get() const
+{
+  return d_content;
 }
 
 } // end namespace sgdc

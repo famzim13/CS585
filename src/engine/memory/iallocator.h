@@ -3,6 +3,7 @@
 #define INCLUDED_IALLOCATOR
 
 #include <new>
+#include <iostream>
 
 namespace StevensDev
 {
@@ -57,19 +58,19 @@ IAllocator<T>::~IAllocator()
 template <class T>
 void IAllocator<T>::construct( T* pointer, const T& copy )
 {
-    pointer = new T( copy );
+    new ( pointer ) T( copy );
 }
 
 template <class T>
 void IAllocator<T>::construct( T* pointer, T&& copy )
 {
-    pointer = new T( copy );
+    new ( pointer ) T( std::move( copy ) );
 }
 
 template <class T>
 void IAllocator<T>::destruct( T* pointer )
 {
-    delete pointer;
+    pointer->~T();
 }
 
 } // end namespace sgdm

@@ -42,11 +42,11 @@ JsonParser::~JsonParser()
 }
 
 // FREE OPERATORS
-template <class T>
+/* template <class T>
 JsonEntity* JsonParser::fromString( const std::string& rawJson, sgdm::IAllocator<T>* allocator = 0)
 {
    
-}
+} */
 
 } // end namespace sgdd
 

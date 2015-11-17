@@ -6,6 +6,7 @@
 #include "../memory/default_allocator.h"
 #include <iostream>
 #include <stdexcept>
+#include <string.h>
 #include <utility>
 
 namespace StevensDev
@@ -33,12 +34,15 @@ class DynamicArray
     unsigned int d_capacity;
       // Maximum number of elements possible in the array.
 
-    unsigned int d_length;
-      // Number of elements in the array.
-    
+    unsigned int d_last_index;
+      // The furthest set index in the array.
+
     // MEMBER FUNCTIONS
     void grow();
       // Increase the capacity of the array when a threshold is met.
+
+    void moveLastIndex( int i );
+      // Checks if the last index needs to be moved, moves it if so.
 
     void shrink();
       // Decrease the capacity of the array when a threshold is met.
@@ -74,7 +78,7 @@ class DynamicArray
     unsigned int getCapacity() const;
       // Returns capacity of the array.
 
-    unsigned int getLength() const;
+    unsigned int getLastIndex() const;
       // Returns number of elements contained.
 
     // MUTATORS
@@ -104,7 +108,7 @@ class DynamicArray
 template <class T>
 std::ostream& operator<<( std::ostream& stream, const DynamicArray<T>& array )
 {
-    return stream << "{ length : " << array.getLength() <<
+    return stream << "{ last_index : " << array.getLastIndex() <<
        ", capacity : " << array.getCapacity() << " }";
 }
 
@@ -112,11 +116,10 @@ std::ostream& operator<<( std::ostream& stream, const DynamicArray<T>& array )
 template <class T>
 DynamicArray<T>::DynamicArray()
 {
-    sgdm::DefaultAllocator<T> defaultAlloc = sgdm::DefaultAllocator<T>();
-    d_alloc = &defaultAlloc;
+    d_alloc = new sgdm::DefaultAllocator<T>();
     d_array = d_alloc->get( DEFAULT_CAPACITY );
     d_capacity = DEFAULT_CAPACITY;
-    d_length = 0;  
+    d_last_index = 0;
 }
 
 template <class T>
@@ -125,17 +128,18 @@ DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc )
     d_alloc = alloc;
     d_array = d_alloc->get( DEFAULT_CAPACITY );
     d_capacity = DEFAULT_CAPACITY;
-    d_length = 0;  
+    d_last_index = 0;
 }
 
 template <class T>
 DynamicArray<T>::DynamicArray( DynamicArray<T>& copy )
 {
-    d_alloc( new sgdm::IAllocator<T>( *copy.d_alloc ) );
+    d_alloc = new sgdm::DefaultAllocator<T>();
+    *d_alloc = *copy.d_alloc;
     d_array = d_alloc->get( copy.d_capacity );
     *d_array = *copy.d_array;
     d_capacity = copy.d_capacity;
-    d_length = copy.d_length;
+    d_last_index = copy.d_last_index;
 }
 
 template <class T>
@@ -144,7 +148,7 @@ DynamicArray<T>::DynamicArray( DynamicArray<T>&& move )
     d_alloc = std::move( move.d_alloc );
     d_array = std::move( move.d_array );
     d_capacity = move.d_capacity;
-    d_length = move.d_length;
+    d_last_index = move.d_last_index;
 }
 
 template <class T>
@@ -153,11 +157,11 @@ DynamicArray<T>& DynamicArray<T>::operator=( const DynamicArray<T>& rhs )
     if( this != &rhs )
     {
       d_alloc->deallocate( d_array, d_capacity );
-      d_alloc( new sgdm::IAllocator<T>( *rhs.d_alloc ) );
+      d_alloc( sgdm::IAllocator<T>( *rhs.d_alloc ) );
       d_array = d_alloc->get( rhs.d_capacity );
       *d_array = *rhs.d_array;
       d_capacity = rhs.d_capacity;
-      d_length = rhs.d_length;
+      d_last_index = rhs.d_last_index;
     }
     return *this;
 }
@@ -166,6 +170,10 @@ DynamicArray<T>& DynamicArray<T>::operator=( const DynamicArray<T>& rhs )
 template <class T>
 DynamicArray<T>::~DynamicArray<T>()
 {
+    for( int i=0; i < d_capacity; i++ )
+    {
+      d_alloc->destruct( &d_array[i] );
+    }
     d_alloc->release( d_array, d_capacity );
 }
 
@@ -179,7 +187,7 @@ const T& DynamicArray<T>::operator[]( int i ) const
 template <class T>
 T DynamicArray<T>::at( unsigned int index ) const
 {
-    if( index < 0 || index >= d_length )
+    if( index < 0 || index >= d_capacity )
     {
       throw std::out_of_range( "Index out of range" );
     }
@@ -194,15 +202,16 @@ unsigned int DynamicArray<T>::getCapacity() const
 }
 
 template <class T>
-unsigned int DynamicArray<T>::getLength() const
+unsigned int DynamicArray<T>::getLastIndex() const
 {
-    return d_length;
+    return d_last_index;
 }
 
 // MUTATORS
 template <class T>
 T& DynamicArray<T>::operator[]( int i )
 {
+    moveLastIndex( i );
     return d_array[i];
 }
 
@@ -214,24 +223,25 @@ void DynamicArray<T>::insertAt( unsigned int index, const T& element )
       throw std::out_of_range( "Index out of range" );
     }
 
-    if( d_length == d_capacity )
+    moveLastIndex( index );
+    if( d_last_index-index == d_capacity )
     {
       grow();
     }
 
-    memmove( &d_array[index + 1], &d_array[index], (d_length-index)*sizeof(T) );
+    memmove( &d_array[index + 1], &d_array[index], (d_last_index-index)*sizeof(T) );
     d_array[index] = element;
-    d_length++;
 }
 
 template <class T>
 T DynamicArray<T>::pop()
 {
-    T popElement = d_array[d_length-1];
-    d_array[d_length-1] = 0;
-    d_length--;
+    T popElement = d_array[d_last_index-1];
+    d_alloc->destruct( d_array[d_last_index-1] );
+    d_last_index--;
 
-    if( d_length < d_capacity * SHRINK_THRESHOLD && d_capacity > MINIMUM_CAPACITY)
+    if( d_last_index < d_capacity * SHRINK_THRESHOLD
+        && d_capacity > MINIMUM_CAPACITY)
     {
       shrink();
     }
@@ -243,10 +253,12 @@ template <class T>
 T DynamicArray<T>::popFront()
 {
     T popElement = d_array[0];
-    memmove( &d_array[0], &d_array[1], d_length*sizeof(T) );
-    d_length--;
+    d_alloc->destruct( d_array[0] );
+    memmove( &d_array[0], &d_array[1], d_last_index*sizeof(T) );
+    d_last_index--;
 
-    if( d_length < d_capacity * SHRINK_THRESHOLD && d_capacity > MINIMUM_CAPACITY)
+    if( d_last_index < d_capacity * SHRINK_THRESHOLD
+        && d_capacity > MINIMUM_CAPACITY)
     {
       shrink();
     }
@@ -257,40 +269,42 @@ T DynamicArray<T>::popFront()
 template <class T>
 void DynamicArray<T>::push( const T& element )
 {
-    if( d_length == d_capacity )
+    if( d_last_index == d_capacity )
     {
       grow();
     }
 
-    d_array[d_length] = element;
-    d_length++;
+    d_array[d_last_index] = element;
+    d_last_index++;
 }
 
 template <class T>
 void DynamicArray<T>::pushFront( const T& element )
 {
-    if( d_length == d_capacity )
+    if( d_last_index == d_capacity )
     {
       grow();
     }
 
-    memmove( &d_array[1], &d_array[0], d_length*sizeof(T) );
+    memmove( &d_array[1], &d_array[0], d_last_index*sizeof(T) );
     d_array[0] = element;
-    d_length++;
+    d_last_index++;
 }
 
 template <class T>
 T DynamicArray<T>::removeAt( unsigned int index )
 {
-    if( index < 0 || index >= d_length )
+    if( index < 0 || index >= d_last_index )
     {
       throw std::out_of_range( "Index out of range" );
     }
 
-    memmove( &d_array[index], &d_array[index+1], (d_length-index)*sizeof(T) );
-    d_length--;
+    d_alloc->destruct( d_array[index] );
+    memmove( &d_array[index], &d_array[index+1], (d_last_index-index)*sizeof(T) );
+    d_last_index--;
 
-    if( d_length < d_capacity * SHRINK_THRESHOLD && d_capacity > MINIMUM_CAPACITY)
+    if( d_last_index < d_capacity * SHRINK_THRESHOLD
+        && d_capacity > MINIMUM_CAPACITY)
     {
       shrink();
     }
@@ -302,10 +316,19 @@ void DynamicArray<T>::grow()
 {
     unsigned int growCapacity = (unsigned int)d_capacity * GOLDEN_RATIO;
     T* growArray = d_alloc->get( growCapacity );
-    std::copy( d_array, &d_array[d_length], growArray );
+    memmove( &growArray[0], &d_array[0], d_last_index*sizeof(T) );
     d_alloc->release( d_array, d_capacity );
     d_array = growArray;
     d_capacity = growCapacity;
+}
+
+template <class T>
+void DynamicArray<T>::moveLastIndex( int i )
+{
+    if( i > d_last_index && i < d_capacity && i >= 0 )
+    {
+      d_last_index = i;
+    }
 }
 
 template <class T>
@@ -318,7 +341,7 @@ void DynamicArray<T>::shrink()
     }
 
     T* shrinkArray = d_alloc->get( shrinkCapacity );
-    std::copy( d_array, &d_array[d_length], shrinkArray );
+    std::copy( d_array, &d_array[d_last_index], shrinkArray );
     d_alloc->release( d_array, d_capacity );
     d_array = shrinkArray;
     d_capacity = shrinkCapacity;

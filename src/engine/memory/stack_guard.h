@@ -69,29 +69,29 @@ StackGuard<T>::~StackGuard()
 }
 
 // ACCESSORS
-template <class T>
+template <class T> inline
 T* StackGuard<T>::operator->() const
 {
     return d_guarded;
 }
 
 // FREE OPERATORS
-template <class T>
+template <class T> inline
 bool StackGuard<T>::operator==( bool rhs ) const
 {
     return rhs;
 }
 
-template <class T>
+template <class T> inline
 bool StackGuard<T>::operator!() const
 {
     return !d_guarded;
 }
 
-template <class T>
+template <class T> inline
 bool StackGuard<T>::operator!=( bool rhs ) const
 {
-    return !rhs;
+    return !operator==( rhs );
 }
 
 } // end namespace sgdm

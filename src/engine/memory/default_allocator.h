@@ -48,14 +48,14 @@ StevensDev::sgdm::DefaultAllocator<T>::~DefaultAllocator()
 template <class T>
 T* StevensDev::sgdm::DefaultAllocator<T>::get( int count )
 {
-  return (T*) ::operator new ( count*sizeof(T) );
+    return (T*) ::operator new ( count*sizeof(T) );
 }
 
 template <class T>
 void StevensDev::sgdm::DefaultAllocator<T>::release( T* memory, int count )
 {
-  delete[] memory;
-  memory = 0;
+    delete[] memory;
+    memory = 0;
 }
 
 } // end namespace sgdm

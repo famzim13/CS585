@@ -24,10 +24,10 @@ enable_testing()
 find_package( Threads REQUIRED )
 
 # Add Subdirectories
-add_subdirectory( lib/gtest-1.7.0 )
+#add_subdirectory( lib/gtest-1.7.0 )
 
 # Include GTest Directories
-include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
+#include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 
 # Add Executables
 # add_executable( testing test/test.cpp )

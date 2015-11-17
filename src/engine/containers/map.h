@@ -26,6 +26,9 @@ class Map
     TrieNode<T>* d_root;
       // Root of the trie.
 
+    // MEMBER FUNCTIONS
+    int hash( const char c ) const;
+
   public:
     // CONSTRUCTORS
     Map();
@@ -75,31 +78,35 @@ class Map
 template <class T>
 Map<T>::Map()
 {
-    d_alloc( new sgdm::DefaultAllocator<T>( ) );
+    d_alloc = new sgdm::DefaultAllocator<T>( );
+    d_root = new sgdc::TrieNode<T>( );
 }
 
 template <class T>
 Map<T>::Map( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
+    d_root = new sgdc::TrieNode<T>( );
 }
 
 template <class T>
 Map<T>::Map( const Map<T>& copy )
 {
-    d_alloc( new sgdm::IAllocator<T>( *copy.d_alloc ) );
+    d_alloc = new sgdm::IAllocator<T>( *copy.d_alloc );
+    d_root = std::copy( copy.d_root );
 }
 
 template <class T>
 Map<T>::Map( Map<T>&& move )
 {
     d_alloc = std::move( move.d_alloc );
+    d_root = std::move( move.d_root );
 }
 
 template <class T>
 Map<T>& Map<T>::operator=( const Map<T>& rhs )
 {
-    d_alloc( new sgdm::IAllocator<T>( *rhs.d_alloc ) );
+    d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
     return *this;
 }
 
@@ -147,8 +154,15 @@ T Map<T>::remove( const std::string& key )
 
 }
 
-}
+// MEMBER FUNCTIONS
+template <class T>
+int Map<T>::hash( const char c ) const
+{
 
 }
+
+} // end namespace sgdc
+
+} // end namespace StevensDev
 
 #endif
