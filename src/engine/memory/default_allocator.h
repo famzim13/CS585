@@ -4,6 +4,7 @@
 
 #include "iallocator.h"
 #include <new>
+#include <iostream>
 
 namespace StevensDev
 {
@@ -20,7 +21,7 @@ class DefaultAllocator : public IAllocator<T>
     // CONSTRUCTORS
     DefaultAllocator();
       // Default constructor.
- 
+
     // DESTRUCTORS
     ~DefaultAllocator();
       // Default destructor.

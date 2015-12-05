@@ -6,6 +6,7 @@
 #include "../memory/default_allocator.h"
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <string.h>
 #include <utility>
 
@@ -26,8 +27,14 @@ class DynamicArray
     sgdm::IAllocator<T>* d_alloc;
       // Allocator that the array uses.
 
+    sgdm::IAllocator<bool>* d_initAlloc;
+      // Allocator for the initialized array.
+
     T* d_array;
       // Internal array of the dynamic array.
+
+    bool* d_init;
+      // Array which tracks whether or not a construction needs to occur.
 
     unsigned int d_capacity;
       // Maximum number of elements possible in the array.
@@ -116,6 +123,8 @@ DynamicArray<T>::DynamicArray()
 {
     d_alloc = new sgdm::DefaultAllocator<T>();
     d_array = d_alloc->get( DEFAULT_CAPACITY );
+    d_initAlloc = new sgdm::DefaultAllocator<bool>();
+    d_init = d_initAlloc->get( DEFAULT_CAPACITY );
     d_capacity = DEFAULT_CAPACITY;
     d_last_index = 0;
 }
@@ -125,6 +134,8 @@ DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
     d_array = d_alloc->get( DEFAULT_CAPACITY );
+    d_initAlloc = new sgdm::DefaultAllocator<bool>();
+    d_init = d_initAlloc->get( DEFAULT_CAPACITY );
     d_capacity = DEFAULT_CAPACITY;
     d_last_index = 0;
 }
@@ -134,6 +145,8 @@ DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc, unsigned int capacity
 {
     d_alloc = alloc;
     d_array = d_alloc->get( capacity );
+    d_initAlloc = new sgdm::DefaultAllocator<bool>();
+    d_init = d_initAlloc->get( DEFAULT_CAPACITY );
     d_capacity = capacity;
     d_last_index = 0;
 }
@@ -145,6 +158,10 @@ DynamicArray<T>::DynamicArray( const DynamicArray<T>& copy )
     *d_alloc = *copy.d_alloc;
     d_array = d_alloc->get( copy.d_capacity );
     *d_array = *copy.d_array;
+    d_initAlloc = new sgdm::DefaultAllocator<bool>();
+    *d_initAlloc = *copy.d_initAlloc;
+    d_init = d_initAlloc->get( copy.d_capacity );
+    *d_init = *copy.d_init;
     d_capacity = copy.d_capacity;
     d_last_index = copy.d_last_index;
 }
@@ -154,6 +171,8 @@ DynamicArray<T>::DynamicArray( DynamicArray<T>&& move )
 {
     d_alloc = std::move( move.d_alloc );
     d_array = std::move( move.d_array );
+    d_initAlloc = std::move( move.d_initAlloc );
+    d_init = std::move( move.d_init );
     d_capacity = move.d_capacity;
     d_last_index = move.d_last_index;
 }
@@ -161,12 +180,16 @@ DynamicArray<T>::DynamicArray( DynamicArray<T>&& move )
 template <class T>
 DynamicArray<T>& DynamicArray<T>::operator=( const DynamicArray<T>& rhs )
 {
+    std::cout << "= Constructor\n";
     if( this != &rhs )
     {
       d_alloc->deallocate( d_array, d_capacity );
       d_alloc( sgdm::IAllocator<T>( *rhs.d_alloc ) );
       d_array = d_alloc->get( rhs.d_capacity );
       *d_array = *rhs.d_array;
+      d_initAlloc( sgdm::IAllocator<bool>( *rhs.d_initAlloc ) );
+      d_init = d_initAlloc->get( rhs.capacity );
+      *d_init = *rhs.d_init;
       d_capacity = rhs.d_capacity;
       d_last_index = rhs.d_last_index;
     }
@@ -180,14 +203,24 @@ DynamicArray<T>::~DynamicArray<T>()
     for( int i=0; i < d_capacity; i++ )
     {
       d_alloc->destruct( &d_array[i] );
+      d_initAlloc->destruct( &d_init[i] );
     }
     d_alloc->release( d_array, d_capacity );
+    d_initAlloc->release( d_init, d_capacity );
+    delete d_alloc;
+    delete d_initAlloc;
 }
 
 // ACCESSORS
 template <class T>
 const T& DynamicArray<T>::operator[]( int i ) const
 {
+    if( !d_init[i] )
+    {
+      d_init[i] = true;
+      d_alloc->construct( &d_array[index], T() );
+    }
+
     return d_array[i];
 }
 
@@ -197,6 +230,12 @@ T DynamicArray<T>::at( unsigned int index ) const
     if( index < 0 || index >= d_capacity )
     {
       throw std::out_of_range( "Index out of range" );
+    }
+
+    if( !d_init[index] )
+    {
+      d_init[index] = true;
+      d_alloc->construct( &d_array[index], T() );
     }
 
     return d_array[index];
@@ -219,6 +258,11 @@ template <class T>
 T& DynamicArray<T>::operator[]( int i )
 {
     moveLastIndex( i );
+    if( !d_init[i] )
+    {
+      d_init[i] = true;
+      d_alloc->construct( &d_array[i], T() );
+    }
     return d_array[i];
 }
 
@@ -237,15 +281,22 @@ void DynamicArray<T>::insertAt( unsigned int index, const T& element )
     }
 
     memmove( &d_array[index + 1], &d_array[index], (d_last_index-index)*sizeof(T) );
-    d_array[index] = element;
+    memmove( &d_init[index + 1], &d_init[index], (d_last_index-index)*sizeof(bool) );
+    d_alloc->construct( &d_array[index], element );
+    d_init[index] = true;
 }
 
 template <class T>
 T DynamicArray<T>::pop()
 {
-    T popElement = d_array[d_last_index-1];
-    d_alloc->destruct( d_array[d_last_index-1] );
-    d_last_index--;
+    T popElement;
+    if( d_init[d_last_index-1] )
+    {
+      popElement = d_array[d_last_index-1];
+      d_alloc->destruct( d_array[d_last_index-1] );
+      d_init[d_last_index-1] = false;
+      d_last_index--;
+    }
 
     return popElement;
 }
@@ -253,10 +304,15 @@ T DynamicArray<T>::pop()
 template <class T>
 T DynamicArray<T>::popFront()
 {
-    T popElement = d_array[0];
-    d_alloc->destruct( d_array[0] );
-    memmove( &d_array[0], &d_array[1], d_last_index*sizeof(T) );
-    d_last_index--;
+    T popElement;
+    if( d_init[0] )
+    {
+      popElement = d_array[0];
+      d_alloc->destruct( d_array[0] );
+      memmove( &d_array[0], &d_array[1], d_last_index*sizeof(T) );
+      memmove( &d_init[0], &d_init[1], d_last_index*sizeof(bool) );
+      d_last_index--;
+    }
 
     return popElement;
 }
@@ -269,7 +325,8 @@ void DynamicArray<T>::push( const T& element )
       grow();
     }
 
-    d_array[d_last_index] = element;
+    d_alloc->construct( &d_array[d_last_index], element );
+    d_init[d_last_index] = true;
     d_last_index++;
 }
 
@@ -282,7 +339,9 @@ void DynamicArray<T>::pushFront( const T& element )
     }
 
     memmove( &d_array[1], &d_array[0], d_last_index*sizeof(T) );
-    d_array[0] = element;
+    d_alloc->construct( &d_array[0], element );
+    memmove( &d_init[1], &d_init[0], d_last_index*sizeof(bool) );
+    d_init[0] = true;
     d_last_index++;
 }
 
@@ -294,9 +353,13 @@ T DynamicArray<T>::removeAt( unsigned int index )
       throw std::out_of_range( "Index out of range" );
     }
 
-    d_alloc->destruct( d_array[index] );
-    memmove( &d_array[index], &d_array[index+1], (d_last_index-index)*sizeof(T) );
-    d_last_index--;
+    if( d_init[index] )
+    {
+      d_alloc->destruct( d_array[index] );
+      memmove( &d_array[index], &d_array[index+1], (d_last_index-index)*sizeof(T) );
+      memmove( &d_init[index], &d_init[index+1], (d_last_index-index)*sizeof(bool) );
+      d_last_index--;
+    }
 }
 
 // MEMBER FUNCTIONS
@@ -308,6 +371,10 @@ void DynamicArray<T>::grow()
     memmove( &growArray[0], &d_array[0], d_last_index*sizeof(T) );
     d_alloc->release( d_array, d_capacity );
     d_array = growArray;
+    bool* growInit = d_initAlloc->get( growCapacity );
+    memmove( &growInit[0], &d_init[0], d_last_index*sizeof(bool) );
+    d_initAlloc->release( d_init, d_capacity );
+    d_init = growInit;
     d_capacity = growCapacity;
 }
 

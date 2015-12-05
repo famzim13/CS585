@@ -37,7 +37,7 @@ class Map
       // Counts of elements in the map.
 
     // MEMBER FUNCTIONS
-    unsigned int hash( const std::string& key ) const;
+    unsigned int getHash( const std::string& key ) const;
       // Hashing function of keys.
 
     void rehash();
@@ -146,31 +146,77 @@ Map<T>::~Map()
 template <class T>
 const T& Map<T>::operator[]( const std::string& key ) const
 {
-    Node<T>* temp = (*d_nodes)[hash( key )];
+    Node<T>* temp = (*d_nodes)[getHash( key )];
     while( temp != NULL )
     {
-      if( temp->d_key == key )
+      if( temp->getKey() == key )
       {
         break;
       }
-      temp = temp->d_next;
+      temp = temp->getNext();
     }
-    return temp->d_value;
+    return temp->getValue();
 }
 
 template <class T>
 bool Map<T>::has( const std::string& key )
 {
+    unsigned int hash = getHash( key );
+    Node<T>* temp = d_nodes[hash];
+
+    while( temp != NULL )
+    {
+      if( temp->getKey() == key )
+      {
+        return true;
+      }
+
+      temp = temp->getNext();
+    }
+
+    return false;
 }
 
 template <class T>
 DynamicArray<std::string> Map<T>::keys() const
 {
+  DynamicArray<std::string> keys = DynamicArray<std::string>();
+  std::string key;
+  Node<T>* temp;
+
+  for( int i=0; i<d_capacity; i++ )
+  {
+    temp = d_nodes[i];
+    while( temp != NULL )
+    {
+      //std::cout << "Attempting at\n";
+      //keys.at(0);
+
+      keys.push( temp->getKey() );
+      temp = temp->getNext();
+    }
+  }
+
+  return keys;
 }
 
 template <class T>
 DynamicArray<T> Map<T>::values() const
 {
+    DynamicArray<T>* values = new DynamicArray<T>( );
+    Node<T>* temp;
+
+    for( int i=0; i<d_capacity; i++ )
+    {
+      temp = d_nodes[i];
+      while( temp != NULL )
+      {
+        values->push( temp->getValue() );
+        temp = temp->getNext();
+      }
+    }
+
+    return *values;
 }
 
 // MUTATORS
@@ -178,14 +224,14 @@ template <class T>
 T& Map<T>::operator[]( const std::string& key )
 {
     bool found = false;
-    unsigned int h = hash( key );
-    Node<T>* temp = d_nodes[h];
+    unsigned int hash = getHash( key );
+    Node<T>* temp = d_nodes[hash];
     Node<T>* temp2;
 
     if( temp == NULL )
     {
       temp = new Node<T>();
-      d_nodes[h] = temp;
+      d_nodes[hash] = temp;
       temp->setKey( key );
     }
 
@@ -213,11 +259,41 @@ T& Map<T>::operator[]( const std::string& key )
 template <class T>
 T Map<T>::remove( const std::string& key )
 {
+    unsigned int hash = getHash( key );
+    T value;
+    Node<T>* temp = d_nodes[hash];
+    Node<T>* previous;
+
+    while( temp != NULL )
+    {
+      if( temp->getKey() == key )
+      {
+        value = temp->getValue();
+        if( previous != NULL and temp->getNext() != NULL )
+        {
+          previous->setNext( temp->getNext() );
+        }
+        else if( temp->getNext() != NULL )
+        {
+          d_nodes[hash] = temp->getNext();
+          delete temp;
+        }
+        else
+        {
+          delete temp;
+        }
+      }
+
+      previous = temp;
+      temp = temp->getNext();
+    }
+
+    return value;
 }
 
 // MEMBER FUNCTIONS
 template <class T>
-unsigned int Map<T>::hash( const std::string& key ) const
+unsigned int Map<T>::getHash( const std::string& key ) const
 {
     unsigned int hash = 1;
     for( int i=0; i<key.length(); i++ )
