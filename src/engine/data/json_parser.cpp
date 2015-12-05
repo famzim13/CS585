@@ -22,7 +22,7 @@ JsonParser::~JsonParser()
 // FREE OPERATORS
 JsonEntity* JsonParser::fromString( const std::string& rawJson )
 {
-    
+    std::cout << rawJson << "\n";
 }
 
 // Stuff to know

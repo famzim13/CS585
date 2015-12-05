@@ -6,6 +6,7 @@
 #include "../containers/dynamic_array.h"
 #include "../containers/map.h"
 #include "../memory/default_allocator.h"
+#include <iostream>
 #include "json_entity.h"
 #include <new>
 #include <string>
