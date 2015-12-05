@@ -1,9 +1,8 @@
 // json_entity.h
 #ifndef INCLUDED_JSON_ENTITY
 #define INCLUDED_JSON_ENTITY
+#pragma once
 
-#include "../containers/dynamic_array.h"
-#include "../containers/map.h"
 #include <string>
 
 namespace StevensDev
@@ -23,13 +22,13 @@ class JsonEntity
     JsonEntity();
       // Default constructor.
 
-    JsonEntity( const JsonEntity& copy );
+    JsonEntity( const sgdd::JsonEntity& copy );
       // Copy constructor.
 
-    JsonEntity( JsonEntity&& move );
+    JsonEntity( sgdd::JsonEntity&& move );
       // Move constructor.
 
-    JsonEntity& operator=( const JsonEntity& copy );
+    JsonEntity& operator=( const sgdd::JsonEntity& copy );
       // Copy assignment constructor.
 
     // DESTRUCTORS
@@ -49,7 +48,7 @@ class JsonEntity
     double asDouble() const;
       // Returns element as a double.
 
-    const sgdm::DynamicArray<int>&  asArray() const;
+    //const sgdm::DynamicArray<int>&  asArray() const;
       // Returns element as an array.
 
     const auto& asObject() const;
@@ -76,99 +75,6 @@ class JsonEntity
     const JsonEntity& operator[]( int index ) const;
       // Gets element from array by its index.
 };
-
-// CONSTRUCTORS
-JsonEntity::JsonEntity()
-{
-
-}
-
-JsonEntity::JsonEntity( const JsonEntity& copy )
-{
-
-}
-
-JsonEntity::JsonEntity( JsonEntity&& move )
-{
-
-}
-
-JsonEntity& JsonEntity::operator=( const JsonEntity& copy )
-{
-
-}
-
-// DESTRUCTORS
-JsonEntity::~JsonEntity()
-{
-
-}
-
-// ACCESSORS
-const JsonEntity& JsonEntity::operator[]( std::string& key ) const
-{
-
-}
-
-const JsonEntity& JsonEntity::operator[]( int index ) const
-{
-
-}
-
-int JsonEntity::asInt() const
-{
-
-}
-
-const std::string& JsonEntity::asString() const
-{
-
-}
-
-double JsonEntity::asDouble() const
-{
-
-}
-
-const sgdm::DynamicArray<int>&  JsonEntity::asArray() const
-{
-
-}
-
-const auto& JsonEntity::asObject() const
-{
-    return 0;
-}
-
-bool JsonEntity::isInt() const
-{
-
-}
-
-bool JsonEntity::isString() const
-{
-
-}
-
-bool JsonEntity::isDouble() const
-{
-
-}
-
-bool JsonEntity::isArray() const
-{
-
-}
-
-bool JsonEntity::isObject() const
-{
-
-}
-
-JsonEntity::EntityTypes JsonEntity::type() const
-{
-
-}
 
 } // end namespace sgdd
 
