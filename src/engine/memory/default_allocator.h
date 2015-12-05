@@ -55,8 +55,7 @@ T* StevensDev::sgdm::DefaultAllocator<T>::get( int count )
 template <class T>
 void StevensDev::sgdm::DefaultAllocator<T>::release( T* memory, int count )
 {
-    delete[] memory;
-    memory = 0;
+    ::operator delete( memory );
 }
 
 } // end namespace sgdm

@@ -6,7 +6,6 @@
 #include "dynamic_array.h"
 #include <iostream>
 #include <new>
-#include "node.h"
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -17,6 +16,10 @@ namespace StevensDev
 namespace sgdc
 {
 
+#define DEFAULT_CAPACITY 3
+#define GOLDEN_RATIO 1.618
+#define GROW_RATIO .8
+
 template <class T>
 class Map
 {
@@ -24,19 +27,31 @@ class Map
     sgdm::IAllocator<T>* d_alloc;
       // Memory allocator for values.
 
-    sgdm::IAllocator<Node<T>*>* d_nodeAlloc;
-      // Memory allocator for nodes.
+    T* d_values;
+      // Array of map values.
 
-    Node<T>** d_nodes;
-      // Array for hash map.
+    sgdm::IAllocator<std::string>* d_keyAlloc;
+      // Memory allocator for keys.
 
-    int d_capacity = 100;
+    std::string* d_keys;
+      // Array of map keys.
+
+    sgdm::IAllocator<bool>* d_initAlloc;
+      // Memory allocator for initialized entries.
+
+    bool* d_init;
+      // Array of initialized map locations.
+
+    unsigned int d_capacity;
       // Capacity of hash map.
 
-    int d_valueCount;
+    unsigned int d_valueCount;
       // Counts of elements in the map.
 
     // MEMBER FUNCTIONS
+    void checkRehash();
+      // Checks if rehashing should occur.
+
     unsigned int getHash( const std::string& key ) const;
       // Hashing function of keys.
 
@@ -93,43 +108,74 @@ template <class T>
 Map<T>::Map()
 {
     d_alloc = new sgdm::DefaultAllocator<T>( );
-    d_nodeAlloc = new sgdm::DefaultAllocator<Node<T>*>( );
-    d_nodes = d_nodeAlloc->get( 100 );
+    d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
+    d_initAlloc = new sgdm::DefaultAllocator<bool>( );
+    d_capacity = DEFAULT_CAPACITY;
+    d_values = d_alloc->get( d_capacity );
+    d_keys = d_keyAlloc->get( d_capacity );
+    d_init = d_initAlloc->get( d_capacity );
+    d_valueCount = 0;
 }
 
 template <class T>
 Map<T>::Map( sgdm::IAllocator<T>* alloc )
 {
     d_alloc = alloc;
-    d_nodeAlloc = new sgdm::DefaultAllocator<Node<T>*>( );
-    d_nodes = d_nodeAlloc->get( 100 );
+    d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
+    d_initAlloc = new sgdm::DefaultAllocator<bool>( );
+    d_capacity = DEFAULT_CAPACITY;
+    d_values = d_alloc->get( d_capacity );
+    d_keys = d_keyAlloc->get( d_capacity );
+    d_init = d_initAlloc->get( d_capacity );
+    d_valueCount = 0;
 }
 
 template <class T>
 Map<T>::Map( const Map<T>& copy )
 {
     d_alloc = new sgdm::IAllocator<T>( *copy.d_alloc );
-    d_nodeAlloc = new sgdm::IAllocator<Node<T>*>( *copy.d_nodeAlloc );
-    d_nodes = d_nodeAlloc->get( 100 );
-    d_nodes = std::copy( *copy.d_nodes );
+    d_keyAlloc = new sgdm::IAllocator<std::string>( *copy.d_keyAlloc );
+    d_initAlloc = new sgdm::IAllocator<bool>( *copy.d_initAlloc );
+    d_capacity = copy.d_capacity;
+    d_valueCount = copy.d_valueCount;
+    d_values = d_alloc->get( d_capacity );
+    d_values = std::copy( *copy.d_values );
+    d_keys = d_keyAlloc->get( d_capacity );
+    d_keys = std::copy( *copy.d_keys );
+    d_init = d_initAlloc->get( d_capacity );
+    d_init = std::copy( *copy.d_init );
 }
 
 template <class T>
 Map<T>::Map( Map<T>&& move )
 {
     d_alloc = std::move( move.d_alloc );
-    d_nodeAlloc = std::move( move.d_nodeAlloc );
-    d_nodes = std::move( move.d_nodes );
+    d_keyAlloc = std::move( move.d_keyAlloc );
+    d_initAlloc = std::move( move.d_initAlloc );
+    d_values = std::move( move.d_values );
+    d_keys = std::move( move.d_keys );
+    d_init = std::move( move.d_init );
+    d_capacity = move.d_capacity;
+    d_valueCount = move.d_valueCount;
 }
 
 template <class T>
 Map<T>& Map<T>::operator=( const Map<T>& rhs )
 {
+    std::cout << "= Constructor\n";
     if( this != rhs )
     {
       d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
-      d_nodeAlloc = new sgdm::IAllocator<Node<T>*>( *rhs.d_nodeAlloc );
-      d_nodes = new DynamicArray<Node<T>*>( *rhs.d_nodes );
+      d_keyAlloc = new sgdm::IAllocator<std::string>( *rhs.d_keyAlloc );
+      d_initAlloc = new sgdm::IAllocator<bool>( *rhs.d_initAlloc );
+      d_capacity = rhs.d_capacity;
+      d_valueCount = rhs.d_valueCount;
+      d_values = d_alloc->get( d_capacity );
+      d_values = std::copy( *rhs.d_values );
+      d_keys = d_keyAlloc->get( d_capacity );
+      d_keys = std::copy( *rhs.d_values);
+      d_init = d_initAlloc->get( d_capacity );
+      d_init = std::copy( *rhs.d_init );
     }
     return *this;
 }
@@ -138,40 +184,36 @@ Map<T>& Map<T>::operator=( const Map<T>& rhs )
 template <class T>
 Map<T>::~Map()
 {
-    delete d_nodes;
-    delete d_nodeAlloc;
+    for( int i=0; i<d_capacity; i++ )
+    {
+      d_alloc->destruct( &d_values[i] );
+      d_keyAlloc->destruct( &d_keys[i] );
+      d_initAlloc->destruct( &d_init[i] );
+    }
+    d_alloc->release( d_values, d_capacity );
+    d_keyAlloc->release( d_keys, d_capacity );
+    d_initAlloc->release( d_init, d_capacity );
+    delete d_values;
+    delete d_keys;
+    delete d_init;
+    delete d_alloc;
+    delete d_keyAlloc;
+    delete d_initAlloc;
 }
 
 // ACCESSORS
 template <class T>
 const T& Map<T>::operator[]( const std::string& key ) const
 {
-    Node<T>* temp = (*d_nodes)[getHash( key )];
-    while( temp != NULL )
-    {
-      if( temp->getKey() == key )
-      {
-        break;
-      }
-      temp = temp->getNext();
-    }
-    return temp->getValue();
+    return d_values[getHash( key )];
 }
 
 template <class T>
 bool Map<T>::has( const std::string& key )
 {
-    unsigned int hash = getHash( key );
-    Node<T>* temp = d_nodes[hash];
-
-    while( temp != NULL )
+    if( d_init[getHash( key )] )
     {
-      if( temp->getKey() == key )
-      {
-        return true;
-      }
-
-      temp = temp->getNext();
+      return true;
     }
 
     return false;
@@ -181,19 +223,12 @@ template <class T>
 DynamicArray<std::string> Map<T>::keys() const
 {
   DynamicArray<std::string> keys = DynamicArray<std::string>();
-  std::string key;
-  Node<T>* temp;
 
   for( int i=0; i<d_capacity; i++ )
   {
-    temp = d_nodes[i];
-    while( temp != NULL )
+    if( d_init[i] )
     {
-      //std::cout << "Attempting at\n";
-      //keys.at(0);
-
-      keys.push( temp->getKey() );
-      temp = temp->getNext();
+      keys.push( d_keys[i] );
     }
   }
 
@@ -203,57 +238,35 @@ DynamicArray<std::string> Map<T>::keys() const
 template <class T>
 DynamicArray<T> Map<T>::values() const
 {
-    DynamicArray<T>* values = new DynamicArray<T>( );
-    Node<T>* temp;
+    DynamicArray<T> values = DynamicArray<T>( );
 
     for( int i=0; i<d_capacity; i++ )
     {
-      temp = d_nodes[i];
-      while( temp != NULL )
+      if( d_init[i] )
       {
-        values->push( temp->getValue() );
-        temp = temp->getNext();
+        values.push( d_values[i] );
       }
     }
 
-    return *values;
+    return values;
 }
 
 // MUTATORS
 template <class T>
 T& Map<T>::operator[]( const std::string& key )
 {
-    bool found = false;
     unsigned int hash = getHash( key );
-    Node<T>* temp = d_nodes[hash];
-    Node<T>* temp2;
-
-    if( temp == NULL )
+    if( !d_init[hash] )
     {
-      temp = new Node<T>();
-      d_nodes[hash] = temp;
-      temp->setKey( key );
+      rehash();
+      hash = getHash( key );
     }
 
-    while( temp != NULL )
-    {
-      if( temp->getKey() == key )
-      {
-        found = true;
-        break;
-      }
-      temp2 = temp;
-      temp = temp->getNext();
-    }
+    d_alloc->construct( &d_values[hash], T() );
+    d_keys[hash] = key;
+    d_valueCount++;
 
-    if( !found )
-    {
-      temp = new Node<T>();
-      temp2->setNext( *temp );
-      temp->setKey( key );
-    }
-
-    return temp->setValue();
+    return d_values[hash];
 }
 
 template <class T>
@@ -261,47 +274,68 @@ T Map<T>::remove( const std::string& key )
 {
     unsigned int hash = getHash( key );
     T value;
-    Node<T>* temp = d_nodes[hash];
-    Node<T>* previous;
-
-    while( temp != NULL )
+    if( d_init[hash] )
     {
-      if( temp->getKey() == key )
-      {
-        value = temp->getValue();
-        if( previous != NULL and temp->getNext() != NULL )
-        {
-          previous->setNext( temp->getNext() );
-        }
-        else if( temp->getNext() != NULL )
-        {
-          d_nodes[hash] = temp->getNext();
-          delete temp;
-        }
-        else
-        {
-          delete temp;
-        }
-      }
-
-      previous = temp;
-      temp = temp->getNext();
+      d_init[hash] = false;
+      value = d_values[hash];
+      d_alloc->destruct( &d_values[hash] );
+      d_keyAlloc->destruct( &d_keys[hash]);
+      d_valueCount--;
     }
-
     return value;
 }
 
 // MEMBER FUNCTIONS
 template <class T>
+void Map<T>::checkRehash( )
+{
+    if( (unsigned int)(GROW_RATIO * d_capacity) <= d_valueCount )
+    {
+      rehash();
+    }
+}
+
+template <class T>
 unsigned int Map<T>::getHash( const std::string& key ) const
 {
-    unsigned int hash = 1;
+    unsigned int hash = 0;
     for( int i=0; i<key.length(); i++ )
     {
-      hash *= key[i];
+      hash = key[i] + ((hash << 5) - hash);
     }
 
     return hash%d_capacity;
+}
+
+template <class T>
+void Map<T>::rehash( )
+{
+    std::cout << "Rehashing\n";
+    unsigned int hash;
+    unsigned int oldCapacity = d_capacity;
+    d_capacity = (unsigned int)(GOLDEN_RATIO * oldCapacity);
+    T* valueGrow = d_alloc->get( d_capacity );
+    std::string* keyGrow = d_keyAlloc->get( d_capacity );
+    bool* initGrow = d_initAlloc->get( d_capacity );
+    std::cout << "Got memory for new size\n";
+
+    for( int i=0; i<oldCapacity; i++ )
+    {
+      if( d_init[i] )
+      {
+        hash = getHash( d_keys[i] );
+        if( initGrow[hash] )
+        {
+          delete valueGrow;
+          delete keyGrow;
+          delete initGrow;
+          rehash();
+        }
+        initGrow[i] = true;
+        keyGrow[i] = d_keys[i];
+        d_alloc->construct( &valueGrow[hash], d_values[i] );
+      }
+    }
 }
 
 } // end namespace sgdc

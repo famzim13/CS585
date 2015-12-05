@@ -2,7 +2,6 @@
 #include <iostream>
 #include "src/engine/containers/dynamic_array.h"
 #include "src/engine/containers/map.h"
-#include "src/engine/containers/node.h"
 #include "src/engine/memory/counting_allocator.h"
 #include "src/engine/memory/default_allocator.h"
 #include "src/engine/memory/iallocator.h"
@@ -13,6 +12,7 @@ int main()
   using namespace StevensDev;
   sgdc::DynamicArray<int>* numbers = new sgdc::DynamicArray<int>();
   numbers->push( 10 );
+  std::cout << "Initializing map\n";
   sgdc::Map<int>* map = new sgdc::Map<int>();
   (*map)[std::string("ab")] = 10;
   std::cout << "Node with key 'ab' has value of " << (*map)[std::string("ab")] << "\n";

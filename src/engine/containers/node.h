@@ -69,6 +69,9 @@ class Node
     void setNext( Node<T>& next );
       // Set the next node of the linked list.
 
+    void setNextNull();
+      // Sets the next node to NULL, needed for map rehashing.
+
 };
 
 // CONSTRUCTORS
@@ -89,9 +92,10 @@ Node<T>::Node( const std::string& key, const T& value )
 template <class T>
 Node<T>::Node( const Node<T>& copy )
 {
-    d_next = std::copy( *copy.d_next );
+    std::cout << "Copy constructor\n";
+    *d_next = *copy.d_next;
     d_key = copy.d_key;
-    d_value = std::copy( copy.d_value );
+    d_value = copy.d_value;
 }
 
 template <class T>
@@ -105,9 +109,10 @@ Node<T>::Node( Node<T>&& move )
 template <class T>
 Node<T>& Node<T>::operator=( const Node<T>& copy )
 {
-    d_next = std::copy( *copy.d_next );
+    std::cout << "Copy next is " << d_next << "\n";
+    d_next = copy.d_next;
     d_key = copy.d_key;
-    d_value = std::copy( copy.d_value );
+    d_value = copy.d_value;
 }
 
 // DESTRUCTORS
@@ -159,6 +164,12 @@ template <class T>
 void Node<T>::setNext( Node<T>& next )
 {
     d_next = &next;
+}
+
+template <class T>
+void Node<T>::setNextNull( )
+{
+    d_next = NULL;
 }
 
 } // end namespace sgdc

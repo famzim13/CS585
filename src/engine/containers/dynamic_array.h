@@ -202,8 +202,11 @@ DynamicArray<T>::~DynamicArray<T>()
 {
     for( int i=0; i < d_capacity; i++ )
     {
-      d_alloc->destruct( &d_array[i] );
-      d_initAlloc->destruct( &d_init[i] );
+      if( d_init[i] )
+      {
+        d_alloc->destruct( &d_array[i] );
+        d_initAlloc->destruct( &d_init[i] );
+      }
     }
     d_alloc->release( d_array, d_capacity );
     d_initAlloc->release( d_init, d_capacity );
