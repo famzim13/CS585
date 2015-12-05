@@ -21,6 +21,23 @@ struct JsonParser
 {
   private:
     sgdm::IAllocator<JsonEntity>* d_alloc;
+      // Allocator for the JsonEntity.
+
+    // MEMBER FUNCTIONS
+    int parseArray( const std::string& rawJson, int pos );
+      // Parsing of arrays.
+
+    int parseBool( const std::string& rawJson, int pos );
+      // Parsing of booleans.
+
+    int parseNumber( const std::string& rawJson, int pos );
+      // Parsing of ints or doubles.
+
+    int parseObject( const std::string& rawJson, int pos );
+      // Parsing of objects.
+
+    int parseString( const std::string& rawJson, int pos );
+      // Parsing of strings.
 
   public:
     // CONSTRUCTORS

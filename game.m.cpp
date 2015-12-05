@@ -12,5 +12,7 @@
 int main()
 {
   using namespace StevensDev;
+  sgdd::JsonParser* parse = new sgdd::JsonParser();
+  parse->fromString( "{ 'name' : 'Configuration', 'values' : [ 1, 3, 'penguin' ] }" );
   return 0;
 }

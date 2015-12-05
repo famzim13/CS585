@@ -22,7 +22,37 @@ JsonParser::~JsonParser()
 // FREE OPERATORS
 JsonEntity* JsonParser::fromString( const std::string& rawJson )
 {
-    std::cout << rawJson << "\n";
+    for( int i=0; i < rawJson.length(); i++ )
+    {
+      std::cout << rawJson[i];
+    }
+    std::cout << '\n';
+}
+
+// MEMBER FUNCTIONS
+int JsonParser::parseArray( const std::string& rawJson, int pos )
+{
+
+}
+
+int JsonParser::parseBool( const std::string& rawJson, int pos )
+{
+
+}
+
+int JsonParser::parseNumber( const std::string& rawJson, int pos )
+{
+
+}
+
+int JsonParser::parseObject( const std::string& rawJson, int pos )
+{
+
+}
+
+int JsonParser::parseString( const std::string& rawJson, int pos )
+{
+
 }
 
 // Stuff to know
