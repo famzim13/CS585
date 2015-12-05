@@ -13,21 +13,21 @@ int main()
   sgdc::DynamicArray<int>* numbers = new sgdc::DynamicArray<int>();
   numbers->push( 10 );
   std::cout << "Initializing map\n";
-  sgdc::Map<int>* map = new sgdc::Map<int>();
+  sgdc::Map<std::string>* map = new sgdc::Map<std::string>();
   std::cout << "Map was initialized\n";
-  (*map)[std::string("ab")] = 10;
+  (*map)[std::string("ab")] = "Apple";
   std::cout << "Node with key 'ab' has value of " << (*map)[std::string("ab")] << "\n";
-  (*map)[std::string("ba")] = 11;
+  (*map)[std::string("ba")] = "Banana";
   std::cout << "Node with key 'ba' has value of " << (*map)[std::string("ba")] << "\n";
-  (*map)[std::string("j")] = 12;
+  (*map)[std::string("j")] = "Oranges";
   std::cout << "Node with key 'j' has value of " << (*map)[std::string("j")] << "\n";
   std::cout << map->has( "ab" ) << " and " << map->has( "q" ) << "\n";
-  sgdc::DynamicArray<int> values = map->values();
+  sgdc::DynamicArray<std::string> values = map->values();
   sgdc::DynamicArray<std::string> keys = map->keys();
   std::cout << "This is the main\n";
-  for( int i=0; i<keys.getLastIndex(); i++ )
+  for( int i=0; i<values.getLastIndex(); i++ )
   {
-    std::cout << keys.at(i) << "\n";
+    std::cout << values.at(i) << "\n";
   }
   std::cout << "The for loop ended\n";
   return 0;

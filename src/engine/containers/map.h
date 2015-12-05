@@ -16,7 +16,7 @@ namespace StevensDev
 namespace sgdc
 {
 
-#define DEFAULT_CAPACITY 3
+#define DEFAULT_MAP_CAPACITY 101
 #define GOLDEN_RATIO 1.618
 #define GROW_RATIO .8
 
@@ -113,7 +113,7 @@ Map<T>::Map()
     d_alloc = new sgdm::DefaultAllocator<T>( );
     d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
     d_initAlloc = new sgdm::DefaultAllocator<bool>( );
-    d_capacity = DEFAULT_CAPACITY;
+    d_capacity = DEFAULT_MAP_CAPACITY;
     d_values = d_alloc->get( d_capacity );
     d_keys = d_keyAlloc->get( d_capacity );
     d_init = d_initAlloc->get( d_capacity );
@@ -126,7 +126,7 @@ Map<T>::Map( sgdm::IAllocator<T>* alloc )
     d_alloc = alloc;
     d_keyAlloc = new sgdm::DefaultAllocator<std::string>( );
     d_initAlloc = new sgdm::DefaultAllocator<bool>( );
-    d_capacity = DEFAULT_CAPACITY;
+    d_capacity = DEFAULT_MAP_CAPACITY;
     d_values = d_alloc->get( d_capacity );
     d_keys = d_keyAlloc->get( d_capacity );
     d_init = d_initAlloc->get( d_capacity );
