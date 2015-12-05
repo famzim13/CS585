@@ -14,6 +14,7 @@ int main()
   numbers->push( 10 );
   std::cout << "Initializing map\n";
   sgdc::Map<int>* map = new sgdc::Map<int>();
+  std::cout << "Map was initialized\n";
   (*map)[std::string("ab")] = 10;
   std::cout << "Node with key 'ab' has value of " << (*map)[std::string("ab")] << "\n";
   (*map)[std::string("ba")] = 11;

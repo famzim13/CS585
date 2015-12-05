@@ -55,7 +55,10 @@ class Map
     unsigned int getHash( const std::string& key ) const;
       // Hashing function of keys.
 
-    void rehash();
+    unsigned int getHash( const std::string& key, unsigned int size ) const;
+      // Hashing function for rehash.
+
+    void rehash( unsigned int growSize );
       // Grows the map and rehashes all elements.
 
   public:
@@ -162,7 +165,6 @@ Map<T>::Map( Map<T>&& move )
 template <class T>
 Map<T>& Map<T>::operator=( const Map<T>& rhs )
 {
-    std::cout << "= Constructor\n";
     if( this != rhs )
     {
       d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
@@ -211,9 +213,13 @@ const T& Map<T>::operator[]( const std::string& key ) const
 template <class T>
 bool Map<T>::has( const std::string& key )
 {
-    if( d_init[getHash( key )] )
+    unsigned int hash = getHash( key );
+    if( d_init[hash] )
     {
-      return true;
+      if( d_keys[hash] == key )
+      {
+        return true;
+      }
     }
 
     return false;
@@ -256,14 +262,19 @@ template <class T>
 T& Map<T>::operator[]( const std::string& key )
 {
     unsigned int hash = getHash( key );
-    if( !d_init[hash] )
+    while( d_init[hash] )
     {
-      rehash();
+      if( key == d_keys[hash] )
+      {
+        return d_values[hash];
+      }
+      rehash( (unsigned int)(GOLDEN_RATIO * d_capacity) );
       hash = getHash( key );
     }
 
     d_alloc->construct( &d_values[hash], T() );
-    d_keys[hash] = key;
+    d_keyAlloc->construct( &d_keys[hash], key );
+    d_init[hash] = true;
     d_valueCount++;
 
     return d_values[hash];
@@ -291,7 +302,7 @@ void Map<T>::checkRehash( )
 {
     if( (unsigned int)(GROW_RATIO * d_capacity) <= d_valueCount )
     {
-      rehash();
+      rehash( (unsigned int)(GOLDEN_RATIO * d_capacity) );
     }
 }
 
@@ -308,34 +319,51 @@ unsigned int Map<T>::getHash( const std::string& key ) const
 }
 
 template <class T>
-void Map<T>::rehash( )
+unsigned int Map<T>::getHash( const std::string& key, unsigned int size ) const
 {
-    std::cout << "Rehashing\n";
-    unsigned int hash;
-    unsigned int oldCapacity = d_capacity;
-    d_capacity = (unsigned int)(GOLDEN_RATIO * oldCapacity);
-    T* valueGrow = d_alloc->get( d_capacity );
-    std::string* keyGrow = d_keyAlloc->get( d_capacity );
-    bool* initGrow = d_initAlloc->get( d_capacity );
-    std::cout << "Got memory for new size\n";
+    unsigned int hash = 0;
+    for( int i=0; i<key.length(); i++ )
+    {
+      hash = key[i] + ((hash << 5) - hash);
+    }
 
-    for( int i=0; i<oldCapacity; i++ )
+    return hash%size;
+}
+
+template <class T>
+void Map<T>::rehash( unsigned int growSize )
+{
+    unsigned int hash;
+    T* valueGrow = d_alloc->get( growSize );
+    std::string* keyGrow = d_keyAlloc->get( growSize );
+    bool* initGrow = d_initAlloc->get( growSize );
+
+    for( int i=0; i<d_capacity; i++ )
     {
       if( d_init[i] )
       {
-        hash = getHash( d_keys[i] );
+        hash = getHash( d_keys[i], growSize );
         if( initGrow[hash] )
         {
           delete valueGrow;
           delete keyGrow;
           delete initGrow;
-          rehash();
+          rehash( (unsigned int)(GOLDEN_RATIO * growSize) );
         }
-        initGrow[i] = true;
-        keyGrow[i] = d_keys[i];
+
+        initGrow[hash] = true;
+        d_keyAlloc->construct( &keyGrow[hash], d_keys[i] );;
         d_alloc->construct( &valueGrow[hash], d_values[i] );
       }
     }
+    delete d_values;
+    delete d_keys;
+    delete d_init;
+
+    d_capacity = growSize;
+    d_values = valueGrow;
+    d_keys = keyGrow;
+    d_init = initGrow;
 }
 
 } // end namespace sgdc
