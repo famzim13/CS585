@@ -16,7 +16,7 @@ namespace StevensDev
 namespace sgdc
 {
 
-#define DEFAULT_MAP_CAPACITY 101
+#define DEFAULT_MAP_CAPACITY 21
 #define GOLDEN_RATIO 1.618
 #define GROW_RATIO .8
 
