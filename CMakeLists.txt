@@ -47,7 +47,9 @@ add_executable( example game.m.cpp
 		src/engine/memory/default_allocator.cpp
 		src/engine/memory/iallocator.cpp
 		src/engine/memory/stack_guard.cpp
+    src/engine/rendering/renderable_sprite.cpp
     src/engine/scene/itickable.cpp )
 
 # Link Libraries
 # target_link_libraries( testing gtest gtest_main )
+target_link_libraries(example ${SFML_LIBRARIES})

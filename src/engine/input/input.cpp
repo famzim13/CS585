@@ -71,7 +71,7 @@ void Input::preTick()
       (sf::Mouse::isButtonPressed( sf::Mouse::Right ))?1:0;
 }
 
-void Input::Tick( float dtS )
+void Input::tick( float dtS )
 {
 
 }

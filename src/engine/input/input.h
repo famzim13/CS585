@@ -58,7 +58,7 @@ class Input : public sgds::ITickable
     void preTick();
       // Pre-tick logic.
 
-    void Tick( float dtS );
+    void tick( float dtS );
       // Tick logic.
 
     void postTick();
