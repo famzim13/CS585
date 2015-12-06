@@ -49,7 +49,8 @@ add_executable( example game.m.cpp
 		src/engine/memory/stack_guard.cpp
     src/engine/rendering/renderable_sprite.cpp
     src/engine/rendering/renderer.cpp
-    src/engine/scene/itickable.cpp )
+    src/engine/scene/itickable.cpp
+    src/engine/scene/scene.cpp )
 
 # Link Libraries
 # target_link_libraries( testing gtest gtest_main )
