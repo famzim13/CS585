@@ -15,7 +15,7 @@ class ICollider
   private:
 
   public:
-    virtual RectangleBounds& bounds() = 0;
+    virtual const RectangleBounds& bounds() const = 0;
       // Return the bounds of the collidable.
 
     virtual unsigned short flags() const = 0;

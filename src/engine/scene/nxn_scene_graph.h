@@ -24,6 +24,9 @@ class NxNSceneGraph : public ITickable
     sgdc::DynamicArray<ICollider*>** d_colliders;
       // Array of colliders in the graph.
 
+    sgdc::DynamicArray<ICollider*> d_updateColliders;
+      // Array of colliders to update graph quicker, less memory allocating.
+
     sgdc::DynamicArray<ICollider*> d_addColliders;
       // Array of colliders to be added to the graph.
 
@@ -34,8 +37,19 @@ class NxNSceneGraph : public ITickable
     NxNSceneGraph();
       // Don't allow default constructor, why have a sizeless graph.
 
-    refreshGraph();
+    sgdc::DynamicArray<ICollider*> find( float x, float y, float width,
+      float height, unsigned int flags, bool checkFlags,
+      const ICollider* collider );
+    // Generic call for all find methods.
+
+    void updateGraph();
       // Update graph locations.
+
+    void addToGraph( ICollider* collider );
+      // Add collider to the graph.
+
+    void removeFromGraph( ICollider* collider );
+      // Remove collider from the graph.
 
   public:
     // CONSTRUCTORS
@@ -47,6 +61,9 @@ class NxNSceneGraph : public ITickable
 
     NxNSceneGraph( NxNSceneGraph&& move );
       // Move constructor for graphs.
+
+    NxNSceneGraph& operator=( const NxNSceneGraph& rhs );
+      // Assignment copy allocator.
 
     // DESTRUCTORS
     ~NxNSceneGraph();
@@ -60,20 +77,19 @@ class NxNSceneGraph : public ITickable
       // Based on the colliders position it removes it from a certain tile.
 
     // ACCESSORS
-    sgdc::DynamicArray<ICollider*> find( float x, float y,
-                                         float width, float height );
+    sgdc::DynamicArray<ICollider*> find(
+      float x, float y, float width, float height );
       // Based on position and size it finds all colliders within that area.
 
     sgdc::DynamicArray<ICollider*> find( float x, float y,
-                                         float width, float height,
-                                         unsigned short flags );
+      float width, float height, unsigned short flags );
       // Based on position and size it finds all colliders with matching flags.
 
     sgdc::DynamicArray<ICollider*> find( const RectangleBounds& bounds );
       // Based on the bounds of the box find all colliders in the area.
 
-    sgdc::DynamicArray<ICollider*> find( const RectangleBounds& bounds,
-                                         unsigned short flags );
+    sgdc::DynamicArray<ICollider*> find(
+      const RectangleBounds& bounds, unsigned short flags );
       // Based on the bounds it finds all colliders with matching flags.
 
     sgdc::DynamicArray<ICollider*> find( const ICollider* collider );
