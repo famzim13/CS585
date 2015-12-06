@@ -42,6 +42,8 @@ add_executable( example game.m.cpp
     src/engine/containers/node.cpp
 		src/engine/data/json_entity.cpp
 		src/engine/data/json_parser.cpp
+    src/engine/events/event_dispatcher.cpp
+    src/engine/events/ievent.cpp
     src/engine/input/input.cpp
 		src/engine/memory/counting_allocator.cpp
 		src/engine/memory/default_allocator.cpp

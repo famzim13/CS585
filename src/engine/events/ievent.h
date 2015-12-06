@@ -2,6 +2,8 @@
 #ifndef INCLUDED_IEVENT
 #define INCLUDED_IEVENT
 
+#include <string>
+
 namespace StevensDev
 {
 
