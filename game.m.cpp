@@ -10,7 +10,9 @@
 #include "src/engine/memory/iallocator.h"
 #include "src/engine/rendering/renderable_sprite.h"
 #include "src/engine/rendering/renderer.h"
+#include "src/engine/scene/icollider.h"
 #include "src/engine/scene/itickable.h"
+#include "src/engine/scene/rectangle_bounds.h"
 #include "src/engine/scene/scene.h"
 #include <string>
 
