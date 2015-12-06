@@ -169,9 +169,9 @@ DynamicArray<T>::DynamicArray( const DynamicArray<T>& copy )
 template <class T>
 DynamicArray<T>::DynamicArray( DynamicArray<T>&& move )
 {
-    d_alloc( move.d_alloc );
+    d_alloc = std::move( move.d_alloc );
     d_array = std::move( move.d_array );
-    d_initAlloc( move.d_initAlloc );
+    d_initAlloc = std::move( move.d_initAlloc );
     d_init = std::move( move.d_init );
     d_capacity = move.d_capacity;
     d_last_index = move.d_last_index;
@@ -295,7 +295,7 @@ T DynamicArray<T>::pop()
     if( d_init[d_last_index-1] )
     {
       popElement = d_array[d_last_index-1];
-      d_alloc->destruct( d_array[d_last_index-1] );
+      d_alloc->destruct( &d_array[d_last_index-1] );
       d_init[d_last_index-1] = false;
       d_last_index--;
     }
@@ -310,7 +310,7 @@ T DynamicArray<T>::popFront()
     if( d_init[0] )
     {
       popElement = d_array[0];
-      d_alloc->destruct( d_array[0] );
+      d_alloc->destruct( &d_array[0] );
       memmove( &d_array[0], &d_array[1], d_last_index*sizeof(T) );
       memmove( &d_init[0], &d_init[1], d_last_index*sizeof(bool) );
       d_last_index--;

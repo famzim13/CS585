@@ -7,11 +7,11 @@ namespace StevensDev
 namespace sgds
 {
 // CONSTRUCTORS
-NxNSceneGraph::NxNSceneGraph( float dimensions, int divisions )
+NxNSceneGraph::NxNSceneGraph( float dimensions, unsigned int divisions )
 {
     d_dimensions = dimensions;
     d_divisions = divisions;
-    d_colliders = new sgdc::DynamicArray<ICollider*>*( d_divisions+1 );
+    *d_colliders = new sgdc::DynamicArray<ICollider*>( d_divisions+1 );
     for( int i=0; i<d_divisions; i++ )
     {
       d_colliders[i] = new sgdc::DynamicArray<ICollider*>( d_divisions+1 );
@@ -99,8 +99,21 @@ sgdc::DynamicArray<ICollider*> NxNSceneGraph::find( float x, float y,
 
 void NxNSceneGraph::updateGraph()
 {
+    for( int i=0; i<d_divisions; i++ )
+    {
+      for( int j=0; j<d_divisions; j++ )
+      {
+        for( int k=0; k<d_colliders[i][j].getLastIndex(); k++ )
+        {
+          d_colliders[i][j].pop();
+        }
+      }
+    }
 
-
+    for( int i=0; i<d_updateColliders.getLastIndex(); i++ )
+    {
+      addToGraph( d_updateColliders[i] );
+    }
 }
 
 void NxNSceneGraph::addToGraph( ICollider* collider )
@@ -207,7 +220,7 @@ void NxNSceneGraph::preTick()
       addToGraph( d_addColliders[i] );
     }
 
-    d_addColliders = DynamicArray<ICollider*>();
+    d_addColliders = sgdc::DynamicArray<ICollider*>();
 }
 
 void NxNSceneGraph::tick( float dtS )
@@ -222,7 +235,7 @@ void NxNSceneGraph::postTick()
       removeFromGraph( d_removeColliders[i] );
     }
 
-    d_removeColliders = DynamicArray<ICollider*>();
+    d_removeColliders = sgdc::DynamicArray<ICollider*>();
 }
 
 

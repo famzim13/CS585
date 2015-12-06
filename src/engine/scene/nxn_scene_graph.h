@@ -18,7 +18,7 @@ class NxNSceneGraph : public ITickable
     float d_dimensions;
       // Size of each direction in the graph.
 
-    int d_divisions;
+    unsigned int d_divisions;
       // Number of times the graph is divided in each direction.
 
     sgdc::DynamicArray<ICollider*>** d_colliders;
@@ -53,7 +53,7 @@ class NxNSceneGraph : public ITickable
 
   public:
     // CONSTRUCTORS
-    NxNSceneGraph( float dimensions, int divisions );
+    NxNSceneGraph( float dimensions, unsigned int divisions );
       // Constructor with dimensions and divisions.
 
     NxNSceneGraph( const NxNSceneGraph& copy );
