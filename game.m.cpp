@@ -9,6 +9,7 @@
 #include "src/engine/memory/default_allocator.h"
 #include "src/engine/memory/iallocator.h"
 #include "src/engine/rendering/renderable_sprite.h"
+#include "src/engine/rendering/renderer.h"
 #include "src/engine/scene/itickable.h"
 #include <string>
 

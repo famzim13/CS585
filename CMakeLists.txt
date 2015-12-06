@@ -48,6 +48,7 @@ add_executable( example game.m.cpp
 		src/engine/memory/iallocator.cpp
 		src/engine/memory/stack_guard.cpp
     src/engine/rendering/renderable_sprite.cpp
+    src/engine/rendering/renderer.cpp
     src/engine/scene/itickable.cpp )
 
 # Link Libraries

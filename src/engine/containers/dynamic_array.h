@@ -169,9 +169,9 @@ DynamicArray<T>::DynamicArray( const DynamicArray<T>& copy )
 template <class T>
 DynamicArray<T>::DynamicArray( DynamicArray<T>&& move )
 {
-    d_alloc = std::move( move.d_alloc );
+    d_alloc( move.d_alloc );
     d_array = std::move( move.d_array );
-    d_initAlloc = std::move( move.d_initAlloc );
+    d_initAlloc( move.d_initAlloc );
     d_init = std::move( move.d_init );
     d_capacity = move.d_capacity;
     d_last_index = move.d_last_index;
@@ -180,15 +180,14 @@ DynamicArray<T>::DynamicArray( DynamicArray<T>&& move )
 template <class T>
 DynamicArray<T>& DynamicArray<T>::operator=( const DynamicArray<T>& rhs )
 {
-    std::cout << "= Constructor\n";
     if( this != &rhs )
     {
-      d_alloc->deallocate( d_array, d_capacity );
-      d_alloc( sgdm::IAllocator<T>( *rhs.d_alloc ) );
+      d_alloc->release( d_array, rhs.d_capacity );
+      d_alloc = rhs.d_alloc;
       d_array = d_alloc->get( rhs.d_capacity );
       *d_array = *rhs.d_array;
-      d_initAlloc( sgdm::IAllocator<bool>( *rhs.d_initAlloc ) );
-      d_init = d_initAlloc->get( rhs.capacity );
+      d_initAlloc = rhs.d_initAlloc;
+      d_init = d_initAlloc->get( rhs.d_capacity );
       *d_init = *rhs.d_init;
       d_capacity = rhs.d_capacity;
       d_last_index = rhs.d_last_index;
@@ -358,7 +357,7 @@ T DynamicArray<T>::removeAt( unsigned int index )
 
     if( d_init[index] )
     {
-      d_alloc->destruct( d_array[index] );
+      d_alloc->destruct( &d_array[index] );
       memmove( &d_array[index], &d_array[index+1], (d_last_index-index)*sizeof(T) );
       memmove( &d_init[index], &d_init[index+1], (d_last_index-index)*sizeof(bool) );
       d_last_index--;
