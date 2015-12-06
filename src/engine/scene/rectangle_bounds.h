@@ -24,7 +24,7 @@ class RectangleBounds
       // Heigh added to the bounding box along the y axis.
 
     // MEMBER FUNCTIONS
-    RectangleBounds() {};
+    RectangleBounds();
       // Default constructor not allowed, why have an sizeless bounding box.
 
   public:

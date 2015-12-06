@@ -57,7 +57,7 @@ class DynamicArray
     DynamicArray( sgdm::IAllocator<T>* alloc );
       // Constructor using an allocator.
 
-    DynamicArray( sgdm::IAllocator<T>* alloc, unsigned int capacity );
+    DynamicArray( unsigned int capacity );
       // Constructor with an initiale capacity.
 
     DynamicArray( const DynamicArray<T>& copy );
@@ -141,9 +141,9 @@ DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc )
 }
 
 template <class T>
-DynamicArray<T>::DynamicArray( sgdm::IAllocator<T>* alloc, unsigned int capacity)
+DynamicArray<T>::DynamicArray( unsigned int capacity)
 {
-    d_alloc = alloc;
+    d_alloc = new sgdm::DefaultAllocator<T>();
     d_array = d_alloc->get( capacity );
     d_initAlloc = new sgdm::DefaultAllocator<bool>();
     d_init = d_initAlloc->get( DEFAULT_CAPACITY );

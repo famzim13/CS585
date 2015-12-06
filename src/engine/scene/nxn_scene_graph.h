@@ -15,33 +15,44 @@ namespace sgds
 class NxNSceneGraph : public ITickable
 {
   private:
-    float d_x;
-      // X dimension of the graph.
-
-    float d_y;
-      // Y dimension of the graph.
+    float d_dimensions;
+      // Size of each direction in the graph.
 
     int d_divisions;
       // Number of times the graph is divided in each direction.
 
-    sgdc::DynamicArray<ICollider*> d_colliders;
+    sgdc::DynamicArray<ICollider*>** d_colliders;
       // Array of colliders in the graph.
+
+    sgdc::DynamicArray<ICollider*> d_addColliders;
+      // Array of colliders to be added to the graph.
+
+    sgdc::DynamicArray<ICollider*> d_removeColliders;
+      // Array of colliders to be removed from the graph.
+
+    // MEMBER FUNCTIONS
+    NxNSceneGraph();
+      // Don't allow default constructor, why have a sizeless graph.
+
+    refreshGraph();
+      // Update graph locations.
 
   public:
     // CONSTRUCTORS
-    NxNSceneGraph();
-      // Default constructor.
+    NxNSceneGraph( float dimensions, int divisions );
+      // Constructor with dimensions and divisions.
+
+    NxNSceneGraph( const NxNSceneGraph& copy );
+      // Copy constructor for graphs.
+
+    NxNSceneGraph( NxNSceneGraph&& move );
+      // Move constructor for graphs.
 
     // DESTRUCTORS
     ~NxNSceneGraph();
       // Default destructor.
 
-    // ACCESSORS
-
     // MUTATORS
-    void NxNSceneGraph( float dimensions, int divisions );
-      // Sets the dimensions and tiles of the graph. This might recalculate it.
-
     void addCollider( ICollider* collider );
       // Based on the colliders position it puts in a certain tile.
 
