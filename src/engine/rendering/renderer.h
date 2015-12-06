@@ -2,6 +2,7 @@
 #define INCLUDED_RENDERER
 
 #include "../containers/dynamic_array.h"
+#include "../containers/map.h"
 #include "renderable_sprite.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -19,6 +20,9 @@ class Renderer
   private:
     sgdc::DynamicArray<RenderableSprite*> d_sprites;
       // DynamicArray of renderable sprites.
+
+    sgdc::Map<sf::Texture> d_textures;
+      // Map of textures, usable on sprites.
 
     sf::RenderWindow d_window;
       // Windows for rendering.

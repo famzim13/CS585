@@ -13,16 +13,19 @@ Renderer::Renderer()
 Renderer::Renderer( const Renderer& copy )
 {
     d_sprites = sgdc::DynamicArray<RenderableSprite*>( copy.d_sprites );
+    d_textures = sgdc::Map<sf::Texture>( copy.d_textures );
 }
 
 Renderer::Renderer( Renderer&& move )
 {
     d_sprites = std::move( move.d_sprites );
+    d_textures = std::move( move.d_textures );
 }
 
 Renderer& Renderer::operator=( const Renderer& rhs )
 {
-    d_sprites = rhs.d_sprites;
+    d_sprites = sgdc::DynamicArray<RenderableSprite*>( rhs.d_sprites );
+    d_textures = sgdc::Map<sf::Texture>( rhs.d_textures );
 }
 
 // DESTRUCTORS
@@ -41,7 +44,7 @@ bool Renderer::isActive()
 
 const sf::Texture& Renderer::getTexture( const std::string& name )
 {
-
+    return d_textures[name];
 }
 
 // MUTATORS
@@ -81,7 +84,11 @@ void Renderer::setupWindow( int width, int height )
 
 bool Renderer::loadTexture( const std::string& name, const std::string& path )
 {
-
+    sf::Texture texture;
+    if( texture.loadFromFile( path ) )
+    {
+      d_textures[name] = texture;
+    }
 }
 
 } // End namespace sgdr.

@@ -136,17 +136,17 @@ Map<T>::Map( sgdm::IAllocator<T>* alloc )
 template <class T>
 Map<T>::Map( const Map<T>& copy )
 {
-    d_alloc = new sgdm::IAllocator<T>( *copy.d_alloc );
-    d_keyAlloc = new sgdm::IAllocator<std::string>( *copy.d_keyAlloc );
-    d_initAlloc = new sgdm::IAllocator<bool>( *copy.d_initAlloc );
+    d_alloc = copy.d_alloc;
+    d_keyAlloc = copy.d_keyAlloc;
+    d_initAlloc = copy.d_initAlloc;
     d_capacity = copy.d_capacity;
     d_valueCount = copy.d_valueCount;
     d_values = d_alloc->get( d_capacity );
-    d_values = std::copy( *copy.d_values );
+    d_values = copy.d_values;
     d_keys = d_keyAlloc->get( d_capacity );
-    d_keys = std::copy( *copy.d_keys );
+    d_keys = copy.d_keys;
     d_init = d_initAlloc->get( d_capacity );
-    d_init = std::copy( *copy.d_init );
+    d_init = copy.d_init;
 }
 
 template <class T>
@@ -165,19 +165,19 @@ Map<T>::Map( Map<T>&& move )
 template <class T>
 Map<T>& Map<T>::operator=( const Map<T>& rhs )
 {
-    if( this != rhs )
+    if( this != &rhs )
     {
-      d_alloc = new sgdm::IAllocator<T>( *rhs.d_alloc );
-      d_keyAlloc = new sgdm::IAllocator<std::string>( *rhs.d_keyAlloc );
-      d_initAlloc = new sgdm::IAllocator<bool>( *rhs.d_initAlloc );
+      d_alloc = rhs.d_alloc;
+      d_keyAlloc = rhs.d_keyAlloc;
+      d_initAlloc = rhs.d_initAlloc;
       d_capacity = rhs.d_capacity;
       d_valueCount = rhs.d_valueCount;
       d_values = d_alloc->get( d_capacity );
-      d_values = std::copy( *rhs.d_values );
+      d_values = rhs.d_values;
       d_keys = d_keyAlloc->get( d_capacity );
-      d_keys = std::copy( *rhs.d_values);
+      d_keys = rhs.d_keys;
       d_init = d_initAlloc->get( d_capacity );
-      d_init = std::copy( *rhs.d_init );
+      d_init = rhs.d_init;
     }
     return *this;
 }
