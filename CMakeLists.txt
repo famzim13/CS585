@@ -51,6 +51,7 @@ add_executable( example game.m.cpp
     src/engine/rendering/renderer.cpp
     src/engine/scene/icollider.cpp
     src/engine/scene/itickable.cpp
+    src/engine/scene/nxn_scene_graph.cpp
     src/engine/scene/rectangle_bounds.cpp
     src/engine/scene/scene.cpp )
 

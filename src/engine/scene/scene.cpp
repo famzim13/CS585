@@ -24,7 +24,7 @@ void Scene::tick()
 
     d_addTickables = sgdc::DynamicArray<ITickable*>();
 
-    double dtS = difftime( d_dtPrev, time( NULL ) );
+    float dtS = difftime( d_dtPrev, time( NULL ) );
 
     for( int i=0; i<d_tickables.getLastIndex(); i++ )
     {
