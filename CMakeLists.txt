@@ -22,12 +22,14 @@ enable_testing()
 
 # Find Packages
 find_package( Threads REQUIRED )
+find_package(SFML 2.1.0 REQUIRED system window graphics network audio)
 
 # Add Subdirectories
 #add_subdirectory( lib/gtest-1.7.0 )
 
 # Include GTest Directories
 #include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
+include_directories( ${SFML_INCLUDE_DIR} )
 
 # Add Flags
 set( CMAKE_BUILDING_TYPE Debug )
@@ -40,10 +42,12 @@ add_executable( example game.m.cpp
     src/engine/containers/node.cpp
 		src/engine/data/json_entity.cpp
 		src/engine/data/json_parser.cpp
+    src/engine/input/input.cpp
 		src/engine/memory/counting_allocator.cpp
 		src/engine/memory/default_allocator.cpp
 		src/engine/memory/iallocator.cpp
-		src/engine/memory/stack_guard.cpp )
+		src/engine/memory/stack_guard.cpp
+    src/engine/scene/itickable.cpp )
 
 # Link Libraries
 # target_link_libraries( testing gtest gtest_main )

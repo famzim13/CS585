@@ -14,7 +14,15 @@ namespace sgdd
 class JsonEntity
 {
   private:
-    enum EntityTypes { intType, stringType, doubleType, arrayType, objectType };
+    enum EntityTypes
+    {
+      ARRAY,
+      BOOL,
+      DOUBLE,
+      INT,
+      OBJECT,
+      STRING
+    };
       // Enum of possible entity types.
 
   public:
