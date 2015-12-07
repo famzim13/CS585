@@ -1,5 +1,7 @@
 // game.m.cpp
 #include <iostream>
+#include "src/engine/actors/iactor.h"
+#include "src/engine/actors/icontroller.h"
 #include "src/engine/containers/dynamic_array.h"
 #include "src/engine/containers/map.h"
 #include "src/engine/data/json_parser.h"

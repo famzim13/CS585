@@ -7,7 +7,7 @@ namespace StevensDev
 namespace mgc
 {
 
-  
-}
 
-}
+} // End namespace mgc.
+
+} // End namespace StevensDev.
