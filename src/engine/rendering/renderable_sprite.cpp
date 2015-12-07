@@ -5,7 +5,7 @@ namespace StevensDev
 
 namespace sgdr
 {
-
+// CONSTRUCTORS
 RenderableSprite::RenderableSprite()
 {
     setPosition( 0.0f, 0.0f );
@@ -37,6 +37,12 @@ RenderableSprite::~RenderableSprite()
 
 }
 
+// MEMBER FUNCTIONS
+void RenderableSprite::updateSprite( float x, float y )
+{
+    d_sprite.setPosition( x, y );
+}
+
 // ACCESSORS
 const sf::Sprite& RenderableSprite::sprite() const
 {
@@ -58,16 +64,19 @@ void RenderableSprite::setPosition( float x, float y )
 {
     d_x = x;
     d_y = y;
+    updateSprite( d_x, d_y );
 }
 
 void RenderableSprite::setPositionX( float x )
 {
     d_x = x;
+    updateSprite( d_x, d_y );
 }
 
 void RenderableSprite::setPositionY( float y )
 {
     d_y = y;
+    updateSprite( d_x, d_y );
 }
 
 void RenderableSprite::setTexture( const sf::Texture& texture )
@@ -79,6 +88,7 @@ void RenderableSprite::move( float x, float y )
 {
     d_x += x;
     d_y += y;
+    updateSprite( d_x, d_y );
 }
 
 } // End namespace sgdr.

@@ -22,6 +22,10 @@ class RenderableSprite
     float d_y;
       // Absolute position along the y axis.
 
+    // MEMBER FUNCTIONS
+    void updateSprite( float x, float y );
+      // Wrapper to sf::sprite setPosition.
+
   public:
     // CONSTRUCTORS
     RenderableSprite();

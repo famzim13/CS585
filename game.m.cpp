@@ -22,18 +22,19 @@
 #include "src/engine/scene/rectangle_bounds.h"
 #include "src/engine/scene/scene.h"
 #include <string>
+#include <thread>
+#include <chrono>
 
 int main()
 {
   using namespace StevensDev;
   sf::Texture redBox = sf::Texture();
   redBox.loadFromFile( "src/game/assets/Test.png" );
-  sgdr::RenderableSprite* sprite = new sgdr::RenderableSprite();
+  sgdr::RenderableSprite* sprite = new sgdr::RenderableSprite( 64, 64);
   sgdr::Renderer* screen = new sgdr::Renderer();
-  std::cout << "Setting texture\n";
   if( screen->loadTexture( "Test", "src/game/assets/Test.png" ) )
   {
-    sprite->setTexture( redBox ); //screen->getTexture( "Test" ) );
+    sprite->setTexture( screen->getTexture( "Test" ) );
   }
   screen->addSprite( sprite );
   screen->setupWindow( 800, 600, "Pacboy" );
@@ -41,12 +42,19 @@ int main()
 
   while( true )
   {
-    if( !screen->isActive() )
-    {
-      screen->getWindow().close();
-      break;
-    }
+    std::cout << "Sprite location is: x " << sprite->getPositionX() <<
+                  " y " << sprite->getPositionY() << "\n";
     screen->draw();
+    sprite->move( 16, 0 );
+    if( sprite->getPositionX() >= 800 )
+    {
+      sprite->setPosition( 0, sprite->getPositionY() + 16 );
+    }
+    if( sprite->getPositionY() >= 600 )
+    {
+      sprite->setPosition( 0, 0 );
+    }
+    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
   }
 
   return 0;
