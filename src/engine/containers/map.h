@@ -86,6 +86,9 @@ class Map
     const T& operator[]( const std::string& key ) const;
       // Retrieves data with that key, undefined behavior if key is not in use.
 
+    const T& operator[]( unsigned int i ) const;
+      // Retrieves the data with that index.
+
     bool has( const std::string& key );
       // Determines if key is in use in the map.
 
@@ -94,6 +97,15 @@ class Map
 
     DynamicArray<T> values() const;
       // Retrieves a dynamic array of values in the map.
+
+    unsigned int getCapacity() const;
+      // Returns the capacity of the map.
+
+    const std::string getKey( unsigned int i ) const;
+      // Returns the key of that index.
+
+    bool getInit( unsigned int i ) const;
+      // Returns whether or not the index is in use.
 
     // MUTATORS
     T& operator[]( const std::string& key );
@@ -211,6 +223,12 @@ const T& Map<T>::operator[]( const std::string& key ) const
 }
 
 template <class T>
+const T& Map<T>::operator[]( unsigned int i ) const
+{
+    return d_values[i];
+}
+
+template <class T>
 bool Map<T>::has( const std::string& key )
 {
     unsigned int hash = getHash( key );
@@ -255,6 +273,29 @@ DynamicArray<T> Map<T>::values() const
     }
 
     return values;
+}
+
+template <class T>
+unsigned int Map<T>::getCapacity() const
+{
+    return d_capacity;
+}
+
+template <class T>
+const std::string Map<T>::getKey( unsigned int i ) const
+{
+    if( d_init[i] )
+    {
+      return d_keys[i];
+    }
+
+    return "";
+}
+
+template <class T>
+bool Map<T>::getInit( unsigned int i ) const
+{
+    return d_init[i];
 }
 
 // MUTATORS

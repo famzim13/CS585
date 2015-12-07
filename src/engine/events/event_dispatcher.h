@@ -3,6 +3,7 @@
 #define INCLUDED_EVENT_DISPATCHER
 
 #include "../containers/dynamic_array.h"
+#include "../containers/map.h"
 #include "../scene/itickable.h"
 #include <functional>
 #include "ievent.h"
@@ -17,14 +18,21 @@ namespace sgde
 class EventDispatcher : public sgds::ITickable
 {
   private:
-    sgdc::Map<sgdc::DynamicArray<std::function<void( const IEvent& )>*>> d_events;
-      // Array of current event listeners.
+    sgdc::Map< sgdc::DynamicArray<std::function<void( const IEvent& )>*> > d_events;
+      // Map of arrays of current event listeners.
 
-    sgdc::Map<sgdc::DynamicArray<std::function<void( const IEvent& )>*>> d_addEvents;
-      // Array of event listeners to be managed.
+    sgdc::Map< sgdc::DynamicArray<std::function<void( const IEvent& )>*> > d_addEvents;
+      // Map of arrays of event listeners to be managed.
 
-    sdgc::Map<sgdc::DynamicArray<std::function<void( const IEvent& )>*>> d_removeEvents;
-      // Array of events to be removed from management.
+    sgdc::Map< sgdc::DynamicArray<std::function<void( const IEvent& )>*> > d_removeEvents;
+      // Map of arrays of events to be removed from management.
+
+    // MEMBER FUNCTIONS
+    void addListeners();
+      // Adds listeners to the map of managed listners.
+
+    void removeListeners();
+      // Removes listeners from the map of managed listeners.
 
   public:
     // CONSTRUCTORS

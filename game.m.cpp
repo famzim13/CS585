@@ -4,6 +4,7 @@
 #include "src/engine/containers/map.h"
 #include "src/engine/data/json_parser.h"
 #include "src/engine/data/json_entity.h"
+#include "src/engine/events/event_bus.h"
 #include "src/engine/events/event_dispatcher.h"
 #include "src/engine/events/ievent.h"
 #include "src/engine/input/input.h"

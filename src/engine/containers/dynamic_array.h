@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../memory/default_allocator.h"
+#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
