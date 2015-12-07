@@ -52,6 +52,9 @@ class Renderer
     const sf::Texture& getTexture( const std::string& name );
       // Returns the texture of sprite.
 
+    sf::RenderWindow& getWindow();
+      // Returns SFML's RenderWindow.
+
     // MUTATORS
     void draw();
       // Render the renderable sprites.
@@ -62,7 +65,7 @@ class Renderer
     void removeSprite( RenderableSprite* sprite );
       // Removes sprite from the render window.
 
-    void setupWindow( int width, int height );
+    void setupWindow( int width, int height, const std::string& title );
       // Creates the rendering window.
 
     bool loadTexture( const std::string& name, const std::string& path );

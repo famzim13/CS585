@@ -31,7 +31,7 @@ Renderer& Renderer::operator=( const Renderer& rhs )
 // DESTRUCTORS
 Renderer::~Renderer()
 {
-  
+
 }
 
 // ACCESSORS
@@ -45,6 +45,11 @@ bool Renderer::isActive()
 const sf::Texture& Renderer::getTexture( const std::string& name )
 {
     return d_textures[name];
+}
+
+sf::RenderWindow& Renderer::getWindow( )
+{
+    return d_window;
 }
 
 // MUTATORS
@@ -77,9 +82,9 @@ void Renderer::removeSprite( RenderableSprite* sprite )
     }
 }
 
-void Renderer::setupWindow( int width, int height )
+void Renderer::setupWindow( int width, int height, const std::string& title )
 {
-    d_window.create( sf::VideoMode( width, height ), "Window" );
+    d_window.create( sf::VideoMode( width, height ), title );
 }
 
 bool Renderer::loadTexture( const std::string& name, const std::string& path )

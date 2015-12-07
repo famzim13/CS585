@@ -2,6 +2,7 @@
 #define INCLUDED_RENDERABLE_SPRITE
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 namespace StevensDev
 {
@@ -61,6 +62,9 @@ class RenderableSprite
 
     void setPositionY( float y );
       // Sets the absolute y position.
+
+    void setTexture( const sf::Texture& texture );
+      // Set the texture of the sprite.
 
     void move( float x, float y );
       // Increments the x and y positions accordingly to input.

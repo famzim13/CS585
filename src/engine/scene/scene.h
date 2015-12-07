@@ -45,6 +45,9 @@ class Scene
     static Scene& getInstance();
       // Retrieve static Scene instance.
 
+    const sgdr::Renderer& getRenderer() const;
+      // Retrieves the sceen renderer.
+
     // MUTATORS
     void tick();
       // Ticks all tickables

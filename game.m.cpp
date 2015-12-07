@@ -2,6 +2,7 @@
 #include <iostream>
 #include "src/engine/actors/iactor.h"
 #include "src/engine/actors/icontroller.h"
+#include "src/engine/actors/ifactory.h"
 #include "src/engine/containers/dynamic_array.h"
 #include "src/engine/containers/map.h"
 #include "src/engine/data/json_parser.h"
@@ -25,7 +26,26 @@
 int main()
 {
   using namespace StevensDev;
-  sgdd::JsonParser* parse = new sgdd::JsonParser();
-  //parse->fromString( "{ 'name' : 'Configuration', 'values' : [ 1, 3, 'penguin' ] }" );
+  sgdr::RenderableSprite* sprite = new sgdr::RenderableSprite();
+  sgdr::Renderer* screen = new sgdr::Renderer();
+  if( screen->loadTexture( "Test", "src/game/assets/Test.png" ) )
+  {
+    std::cout << "Texture loaded correctly\n";
+    sprite->setTexture( screen->getTexture( "Test" ) );
+  }
+  screen->addSprite( sprite );
+  screen->setupWindow( 800, 600, "Pacboy" );
+  screen->getWindow().setActive( true );
+
+  while( true )
+  {
+    if( !screen->isActive() )
+    {
+      screen->getWindow().close();
+      break;
+    }
+    screen->draw();
+  }
+
   return 0;
 }

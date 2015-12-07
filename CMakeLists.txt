@@ -39,6 +39,7 @@ set( CMAKE_BUILDING_TYPE Debug )
 add_executable( example game.m.cpp
     src/engine/actors/iactor.cpp
     src/engine/actors/icontroller.cpp
+    src/engine/actors/ifactory.cpp
 		src/engine/containers/dynamic_array.cpp
 		src/engine/containers/map.cpp
     src/engine/containers/node.cpp

@@ -70,6 +70,11 @@ void RenderableSprite::setPositionY( float y )
     d_y = y;
 }
 
+void RenderableSprite::setTexture( const sf::Texture& texture )
+{
+    d_sprite.setTexture( texture );
+}
+
 void RenderableSprite::move( float x, float y )
 {
     d_x += x;
