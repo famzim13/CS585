@@ -4,7 +4,6 @@
 #pragma once
 
 #include "../memory/default_allocator.h"
-#include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -221,7 +220,7 @@ const T& DynamicArray<T>::operator[]( int i ) const
     if( !d_init[i] )
     {
       d_init[i] = true;
-      d_alloc->construct( &d_array[index], T() );
+      d_alloc->construct( &d_array[i], T() );
     }
 
     return d_array[i];
