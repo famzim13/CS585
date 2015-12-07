@@ -129,6 +129,10 @@ Map<T>::Map()
     d_values = d_alloc->get( d_capacity );
     d_keys = d_keyAlloc->get( d_capacity );
     d_init = d_initAlloc->get( d_capacity );
+    for( int i=0; i<d_capacity; i++ )
+    {
+      d_init[i] = false;
+    }
     d_valueCount = 0;
 }
 
@@ -142,6 +146,10 @@ Map<T>::Map( sgdm::IAllocator<T>* alloc )
     d_values = d_alloc->get( d_capacity );
     d_keys = d_keyAlloc->get( d_capacity );
     d_init = d_initAlloc->get( d_capacity );
+    for( int i=0; i<d_capacity; i++ )
+    {
+      d_init[i] = false;
+    }
     d_valueCount = 0;
 }
 

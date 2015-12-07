@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Event.hpp>
 #include <string>
+#include <iostream>
 
 namespace StevensDev
 {

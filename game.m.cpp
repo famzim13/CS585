@@ -26,12 +26,14 @@
 int main()
 {
   using namespace StevensDev;
+  sf::Texture redBox = sf::Texture();
+  redBox.loadFromFile( "src/game/assets/Test.png" );
   sgdr::RenderableSprite* sprite = new sgdr::RenderableSprite();
   sgdr::Renderer* screen = new sgdr::Renderer();
+  std::cout << "Setting texture\n";
   if( screen->loadTexture( "Test", "src/game/assets/Test.png" ) )
   {
-    std::cout << "Texture loaded correctly\n";
-    sprite->setTexture( screen->getTexture( "Test" ) );
+    sprite->setTexture( redBox ); //screen->getTexture( "Test" ) );
   }
   screen->addSprite( sprite );
   screen->setupWindow( 800, 600, "Pacboy" );

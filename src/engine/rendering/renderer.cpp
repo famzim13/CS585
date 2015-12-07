@@ -93,7 +93,9 @@ bool Renderer::loadTexture( const std::string& name, const std::string& path )
     if( texture.loadFromFile( path ) )
     {
       d_textures[name] = texture;
+      return true;
     }
+    return false;
 }
 
 } // End namespace sgdr.
