@@ -4,6 +4,8 @@
 
 #include "../../engine/rendering/renderable_sprite.h"
 #include "../../engine/scene/rectangle_bounds.h"
+#include <stdlib.h>
+#include <time.h>
 
 namespace StevensDev
 {
@@ -19,6 +21,12 @@ class BallActor
 
     sgds::RectangleBounds* d_bounds;
       // Bounds of the actor.
+
+    float d_x;
+      // Position along the x axis.
+
+    float d_y;
+      // Position along the y axis.
 
     float d_velocityX;
       // Velocity along the x axis.
@@ -47,6 +55,12 @@ class BallActor
     sgds::RectangleBounds* getBounds();
       // Returns the collider of the actor.
 
+    const float getX() const;
+      // Get the x position.
+
+    const float getY() const;
+      // Get the y position.
+
     // MUTATORS
     void move( float x, float y );
       // Update the positioning of the ball.
@@ -62,8 +76,8 @@ class BallActor
       // Checks if actor collides with another actor.
 };
 
-}
+} // End namespace sgdg.
 
-}
+} // End namespace StevensDev.
 
 #endif

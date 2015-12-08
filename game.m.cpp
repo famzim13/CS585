@@ -48,7 +48,6 @@ int main()
   screen->setupWindow( 1024, 560, "Pang" );
   screen->getWindow().setActive( true );
 
-  float moveX = 0;
   float moveY = 0;
   int loop = 10;
 
@@ -78,19 +77,19 @@ int main()
 
     if( moveY != 0 )
     {
-      if( ball->getSprite()->getPositionY() + moveY <= 0 )
+      if( ball->getY() + moveY <= 0 )
       {
-        ball->setPosition( 0, ball->getSprite()->getPositionY() );
-        moveX = 0;
+        ball->setPosition( ball->getX(), 0 );
+        moveY = 0;
       }
-      else if( ball->getSprite()->getPositionX() + moveX + (float)(tSize.x/10) >= 560 )
+      else if( ball->getY() + moveY + (float)tSize.y >= 560 )
       {
-        ball->setPosition( 560 - (float)(tSize.x/10), ball->getSprite()->getPositionY() );
-        moveX = 0;
+        ball->setPosition( ball->getX(), 560 - (float)tSize.y );
+        moveY = 0;
       }
       else
       {
-        ball->move( moveX, 0 );
+        ball->move( 0, moveY );
       }
     }
 
