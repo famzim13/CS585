@@ -17,25 +17,18 @@ class IActor
   private:
 
   public:
+    // CONSTRUCTORS
+    IActor( float x, float y, const sf::Texture& texture );
+
     // ACCESSORS
-    virtual const sgds::ICollider& getBounds() const = 0;
+    virtual sgds::ICollider* getBounds() = 0;
       // Actors may have bounds.
 
-    virtual const sgdr::RenderableSprite& getSprite() const = 0;
+    virtual sgdr::RenderableSprite* getSprite() = 0;
       // Actors may have a sprite.
 
-    virtual const sgde::EventBus& getEvents() const = 0;
+    virtual sgde::EventBus* getEvents() = 0;
       // Actors may have events.
-
-    // MUTATORS
-    virtual void setBounds( const sgds::ICollider& collider ) = 0;
-      // Actors may set bounds.
-
-    virtual void setSprite( const sgdr::RenderableSprite& sprite ) = 0;
-      // Actors may set a sprite.
-
-    virtual void setEvents( const sgde::EventBus& events ) = 0;
-      // Actors may set events.
 };
 
 } // End namespace sgda.

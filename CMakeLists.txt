@@ -60,7 +60,8 @@ add_executable( example game.m.cpp
     src/engine/scene/nxn_scene_graph.cpp
     src/engine/scene/rectangle_bounds.cpp
     src/engine/scene/scene.cpp
-    src/game/actors/ball_actor.cpp )
+    src/game/actors/ball_actor.cpp
+    src/game/actors/paddle_actor.cpp )
 
 # Link Libraries
 # target_link_libraries( testing gtest gtest_main )
