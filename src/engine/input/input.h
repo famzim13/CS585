@@ -18,12 +18,19 @@ class Input : public sgds::ITickable
     Input() {};
       // Default constructor, static instance only.
 
-    Input( const Input& input ) = delete;
+    //Input( const Input& input ) = delete;
       // Singleton, no copy constructor allowed.
 
     Input& operator=( const Input& input ) = delete;
       // Singleton, no assignment copy constructor allowed.
 
+    bool previousInputs[INPUTS] = {0};
+      // Array of previous inputs.
+
+    bool currentInputs[INPUTS] = {0};
+      // Array of current inputs.
+
+  public:
     enum Type
     {
       A, B, C, D, E, F,
@@ -34,14 +41,7 @@ class Input : public sgds::ITickable
       M_MOUSE, R_MOUSE
     };
       // Enum of possible input types.
-
-    bool previousInputs[INPUTS] = {0};
-      // Array of previous inputs.
-
-    bool currentInputs[INPUTS] = {0};
-      // Array of current inputs.
-
-  public:
+      
     // FREE OPERATORS
     static Input& getInstance();
       // Returns a static instance of the input singleton.

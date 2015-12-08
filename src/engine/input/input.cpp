@@ -10,7 +10,7 @@ namespace sgdi
 
 Input& Input::getInstance()
 {
-    static Input instance;
+    static Input instance = Input();
     return instance;
 }
 
