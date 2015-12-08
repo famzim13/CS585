@@ -4,6 +4,7 @@
 
 #include "../../engine/rendering/renderable_sprite.h"
 #include "../../engine/scene/rectangle_bounds.h"
+#include <math.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -61,12 +62,21 @@ class BallActor
     const float getY() const;
       // Get the y position.
 
+    const float getVelocityX() const;
+      // Get the x velocity.
+
+    const float getVelocityY() const;
+      // Get the y velocity.
+
     // MUTATORS
     void move( float x, float y );
       // Update the positioning of the ball.
 
     void setPosition( float x, float y );
       // Update the positioning of the ball.
+
+    void bounce( int x, int y );
+      // Bounce off the wall.
 
     void spawn();
       // Spawn a new ball upon game start or score.

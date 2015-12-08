@@ -42,6 +42,16 @@ const float BallActor::getY() const
     return d_y;
 }
 
+const float BallActor::getVelocityX() const
+{
+    return d_velocityX;
+}
+
+const float BallActor::getVelocityY() const
+{
+    return d_velocityY;
+}
+
 // MUTATORS
 void BallActor::move( float x, float y )
 {
@@ -59,11 +69,29 @@ void BallActor::setPosition( float x, float y )
     d_bounds->setPosition( d_sprite->getPositionX(), d_sprite->getPositionY() );
 }
 
+void BallActor::bounce( int x, int y )
+{
+    d_velocityX *= x;
+    d_velocityY *= y;
+}
+
 void BallActor::spawn()
 {
     float speeed = 3.2;
+    setPosition( 512, 280 );
     srand( time( NULL ) );
-    int angle = rand()%30+31;
+    int angle = rand()%121-60;
+    if( d_direction )
+    {
+      d_velocityX = 3.2 * cos( (float)angle * ( M_PI / 180) );
+      d_velocityY = 3.2 * sin( (float)angle * ( M_PI / 180) );
+    }
+    else
+    {
+      d_velocityX = -3.2 * cos( (float)angle * ( M_PI / 180) );
+      d_velocityY = 3.2 * sin( (float)angle * ( M_PI / 180) );
+    }
+    d_direction = !d_direction;
 }
 
 bool BallActor::doesCollide( const sgds::RectangleBounds& candidate )

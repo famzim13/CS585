@@ -41,7 +41,7 @@ int main()
 
   if( screen->loadTexture( "Test", "src/game/assets/Test.png" ) )
   {
-    ball = new sgdg::BallActor( 16, 16, screen->getTexture( "Test" ) );
+    ball = new sgdg::BallActor( 512, 280, screen->getTexture( "Test" ) );
   }
 
   screen->addSprite( ball->getSprite() );
@@ -50,49 +50,28 @@ int main()
 
   float moveY = 0;
   int loop = 10;
+  ball->spawn();
 
   while( true )
   {
     screen->draw();
     input.preTick();
 
-    if( loop == 10 )
-    {
-      loop = 0;
-      moveY = 0;
-
-      if( input.isDown( sgdi::Input::Type::W ) )
-      {
-        moveY += -16;
-      }
-      if( input.isDown( sgdi::Input::Type::S ) )
-      {
-        moveY += 16;
-      }
-
-      moveY = moveY/10;
-    }
-
     sf::Vector2u tSize = ball->getSprite()->sprite().getTexture()->getSize();
 
-    if( moveY != 0 )
+    if( ( ball->getX() <= 0 ) ||
+        ( ball->getX() >= 1024 ) )
     {
-      if( ball->getY() + moveY <= 0 )
-      {
-        ball->setPosition( ball->getX(), 0 );
-        moveY = 0;
-      }
-      else if( ball->getY() + moveY + (float)tSize.y >= 560 )
-      {
-        ball->setPosition( ball->getX(), 560 - (float)tSize.y );
-        moveY = 0;
-      }
-      else
-      {
-        ball->move( 0, moveY );
-      }
+      ball->spawn();
     }
 
+    if( ( ball->getY() + ball->getVelocityY() <= 0 ) ||
+        ( ball->getY() + ball->getVelocityY() + (float)tSize.y >= 560 ) )
+    {
+      ball->bounce( 1, -1 );
+    }
+
+    ball->move( ball->getVelocityX(), ball->getVelocityY() );
     loop++;
     std::this_thread::sleep_for( std::chrono::milliseconds( 5 ) );
   }
